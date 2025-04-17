@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Upload Flyer - Kombel ICE SAF</title>
   <style>
     body {
@@ -27,7 +27,10 @@
       display: block;
       margin-bottom: 8px;
     }
-    input[type="text"], input[type="date"], input[type="file"], button {
+    input[type="text"],
+    input[type="date"],
+    input[type="file"],
+    button {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -47,54 +50,73 @@
 <body>
   <h1>Upload Flyer Baru</h1>
 
-  <form id="uploadForm" enctype="multipart/form-data">
-    <label>Nama Pemateri:</label><br>
-    <input type="text" name="nama" required><br><br>
+  <form id="uploadForm">
+    <label>Nama Pemateri:</label>
+    <input type="text" id="nama" required />
 
-    <label>Judul Materi:</label><br>
-    <input type="text" name="judul_materi" required><br><br>
+    <label>Judul Materi:</label>
+    <input type="text" id="judul_materi" required />
 
-    <label>Tanggal Pelaksanaan:</label><br>
-    <input type="date" name="tanggal" required><br><br>
+    <label>Tanggal Pelaksanaan:</label>
+    <input type="date" id="tanggal" required />
 
-    <label>Tempat Pelaksanaan:</label><br>
-    <input type="text" name="tempat" required><br><br>
+    <label>Tempat Pelaksanaan:</label>
+    <input type="text" id="tempat" required />
 
-    <label>Waktu Pelaksanaan:</label><br>
-    <input type="text" name="waktu" placeholder="Contoh: 08:00 - 10:00" required><br><br>
+    <label>Waktu Pelaksanaan:</label>
+    <input type="text" id="waktu" placeholder="Contoh: 08:00 - 10:00" required />
 
-    <label>Upload Foto Flyer:</label><br>
-    <input type="file" name="foto" accept="image/*" required><br><br>
+    <label>Upload Foto Flyer:</label>
+    <input type="file" id="foto" accept="image/*" required />
 
     <button type="submit">Kirim</button>
   </form>
 
-  <script>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const supabase = createClient(
+      'https://jmmqpqbpdmaelfnjhgly.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptbXFwcWJwZG1hZWxmbmpoZ2x5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NDg2OTU3MiwiZXhwIjoyMDYwNDQ1NTcyfQ.zgMx01d27LlvSdteA4hDEbT_EFCkdxlKhlBbxb5A0fE'
+    );
+
     document.getElementById("uploadForm").addEventListener("submit", async function (e) {
       e.preventDefault();
-      const form = e.target;
-      const formData = new FormData(form);
 
-      try {
-        const response = await fetch("/upload", {
-          method: "POST",
-          body: formData
-        });
+      const nama = document.getElementById("nama").value.trim();
+      const judul = document.getElementById("judul_materi").value.trim();
+      const tanggal = document.getElementById("tanggal").value;
+      const tempat = document.getElementById("tempat").value.trim();
+      const waktu = document.getElementById("waktu").value.trim();
+      const file = document.getElementById("foto").files[0];
 
-        const result = await response.json();
-
-        if (response.ok) {
-          alert("Flyer berhasil diupload!");
-          console.log("Detail upload:", result);
-          // Redirect ke halaman index jika perlu
-          // window.location.href = "/index.html";
-        } else {
-          alert("Gagal upload: " + result.message);
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        alert("Terjadi kesalahan saat mengupload.");
+      if (!file) {
+        alert("Silakan pilih file gambar flyer.");
+        return;
       }
+
+      const filename = `${Date.now()}_${file.name}`;
+      const { error: uploadError } = await supabase.storage
+        .from("flyers")
+        .upload(filename, file);
+
+      if (uploadError) {
+        alert("Gagal upload flyer: " + uploadError.message);
+        return;
+      }
+
+      alert("Flyer berhasil diupload!");
+
+      console.log({
+        nama,
+        judul,
+        tanggal,
+        tempat,
+        waktu,
+        flyer_url: filename
+      });
+
+      e.target.reset();
     });
   </script>
 </body>
