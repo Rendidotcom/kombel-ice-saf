@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import mysql from "mysql2";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -10,50 +9,42 @@ const port = 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "", // sesuaikan
-  database: "kombel_ice_saf",
-});
+const uploadDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
 
-// Multer untuk upload foto
 const storage = multer.diskStorage({
-  destination: function (_req, _file, cb) {
-    const dir = path.join(__dirname, "uploads");
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-    cb(null, dir);
-  },
-  filename: function (_req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
+  destination: (_req, _file, cb) => cb(null, uploadDir),
+  filename: (_req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + "-" + file.originalname);
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB
 
-// Endpoint untuk menyimpan flyer
-app.post("/flyer", upload.single("foto"), (req, res) => {
-  const { nama, judul_materi, tanggal, tempat, waktu } = req.body;
-  const foto = req.file ? req.file.filename : null;
+app.post("/upload", upload.single("foto"), function (req, res) {
+  const file = req.file as Express.Multer.File | undefined;
 
-  const sql = `INSERT INTO flyer (nama, judul_materi, foto, tanggal, tempat, waktu)
-               VALUES (?, ?, ?, ?, ?, ?)`;
-  db.query(sql, [nama, judul_materi, foto, tanggal, tempat, waktu], (err) => {
-    if (err) return res.status(500).send(err);
-    res.send("Flyer berhasil disimpan");
+  if (!file) {
+    res.status(400).json({ message: "No file uploaded." });
+    return;
+  }
+
+  res.json({
+    message: "File uploaded successfully.",
+    filename: file.filename,
+    path: `/uploads/${file.filename}`,
   });
 });
 
-// Endpoint untuk menampilkan semua flyer
-app.get("/flyer", (_req, res) => {
-  db.query("SELECT * FROM flyer ORDER BY id DESC", (err, results) => {
-    if (err) return res.status(500).send(err);
-    res.json(results);
-  });
-});
+app.use("/uploads", express.static(uploadDir));
 
 app.listen(port, () => {
-  console.log(`Server berjalan di http://localhost:${port}`);
+  console.log(`Server is running on http://localhost:${port}`);
 });
+
+// Tambahkan ekspor default agar bisa digunakan di Vercel
+export default app;

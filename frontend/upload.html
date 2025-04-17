@@ -2,49 +2,39 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Upload Flyer - Kombel ICE SAF</title>
-  <style>
-    body { font-family: sans-serif; max-width: 500px; margin: 20px auto; }
-    form { display: flex; flex-direction: column; gap: 10px; }
-    input, textarea, button { padding: 8px; font-size: 16px; }
-  </style>
 </head>
 <body>
-  <h2>Form Upload Flyer</h2>
-  <form id="flyerForm">
-    <input type="text" name="nama" placeholder="Nama Pemateri" required>
-    <input type="text" name="judul_materi" placeholder="Judul Materi" required>
-    <input type="file" name="foto" accept="image/*" required>
-    <input type="date" name="tanggal" required>
-    <input type="text" name="tempat" placeholder="Tempat Pelaksanaan" required>
-    <input type="time" name="waktu" required>
-    <button type="submit">Upload</button>
+  <h1>Upload Flyer Baru</h1>
+
+  <form id="uploadForm" enctype="multipart/form-data">
+    <label>Nama Pemateri:</label><br>
+    <input type="text" name="nama" required><br><br>
+
+    <label>Judul Materi:</label><br>
+    <input type="text" name="judul_materi" required><br><br>
+
+    <label>Tanggal Pelaksanaan:</label><br>
+    <input type="date" name="tanggal" required><br><br>
+
+    <label>Tempat Pelaksanaan:</label><br>
+    <input type="text" name="tempat" required><br><br>
+
+    <label>Waktu Pelaksanaan:</label><br>
+    <input type="text" name="waktu" placeholder="Contoh: 08:00 - 10:00" required><br><br>
+
+    <label>Upload Foto Flyer:</label><br>
+    <input type="file" name="foto" accept="image/*" required><br><br>
+
+    <button type="submit">Kirim</button>
   </form>
 
-  <p id="status"></p>
-
-  <script>
-    const form = document.getElementById("flyerForm");
-    const status = document.getElementById("status");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const formData = new FormData(form);
-
-      try {
-        const response = await fetch("http://localhost:3000/flyer", {
-          method: "POST",
-          body: formData
-        });
-
-        const text = await response.text();
-        status.innerText = response.ok ? "Berhasil upload flyer!" : `Gagal: ${text}`;
-        form.reset();
-      } catch (error) {
-        status.innerText = "Terjadi kesalahan saat mengirim data.";
-      }
-      <script src="js/upload.js"></script>
-    });
-  </script>
+  <script src="./js/upload.js"></script>
 </body>
 </html>
+<form action="http://localhost:3000/upload" method="POST" enctype="multipart/form-data">
+  <label for="file">Choose file:</label>
+  <input type="file" id="file" name="file">
+  <button type="submit">Upload</button>
+</form>

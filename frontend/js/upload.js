@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,24 +8,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const form = document.getElementById("flyerForm");
-const status = document.getElementById("status");
-form.addEventListener("submit", (e) => __awaiter(this, void 0, void 0, function* () {
-    e.preventDefault();
-    const formData = new FormData(form);
+const uploadForm = document.getElementById('uploadForm');
+uploadForm.addEventListener('submit', (event) => __awaiter(void 0, void 0, void 0, function* () {
+    event.preventDefault();
+    const formData = new FormData(uploadForm);
     try {
-        const response = yield fetch("http://localhost:3000/flyer", {
-            method: "POST",
+        const response = yield fetch('http://localhost:3000/flyer', {
+            method: 'POST',
             body: formData,
         });
-        const text = yield response.text();
-        status.innerText = response.ok
-            ? "Berhasil upload flyer!"
-            : `Gagal: ${text}`;
-        form.reset();
+        const result = yield response.json();
+        if (response.ok) {
+            alert('Flyer berhasil diupload!');
+            uploadForm.reset();
+        }
+        else {
+            alert('Gagal upload: ' + (result.error || 'Terjadi kesalahan.'));
+        }
     }
     catch (error) {
-        status.innerText = "Terjadi kesalahan saat mengirim data.";
-        console.error("Upload error:", error);
+        console.error('Terjadi kesalahan:', error);
+        alert('Gagal upload flyer.');
     }
 }));
