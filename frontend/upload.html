@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Flyer - Kombel ICE SAF</title>
+  <style>
+    body { font-family: sans-serif; max-width: 500px; margin: 20px auto; }
+    form { display: flex; flex-direction: column; gap: 10px; }
+    input, textarea, button { padding: 8px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h2>Form Upload Flyer</h2>
+  <form id="flyerForm">
+    <input type="text" name="nama" placeholder="Nama Pemateri" required>
+    <input type="text" name="judul_materi" placeholder="Judul Materi" required>
+    <input type="file" name="foto" accept="image/*" required>
+    <input type="date" name="tanggal" required>
+    <input type="text" name="tempat" placeholder="Tempat Pelaksanaan" required>
+    <input type="time" name="waktu" required>
+    <button type="submit">Upload</button>
+  </form>
+
+  <p id="status"></p>
+
+  <script>
+    const form = document.getElementById("flyerForm");
+    const status = document.getElementById("status");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch("http://localhost:3000/flyer", {
+          method: "POST",
+          body: formData
+        });
+
+        const text = await response.text();
+        status.innerText = response.ok ? "Berhasil upload flyer!" : `Gagal: ${text}`;
+        form.reset();
+      } catch (error) {
+        status.innerText = "Terjadi kesalahan saat mengirim data.";
+      }
+      <script src="js/upload.js"></script>
+    });
+  </script>
+</body>
+</html>
