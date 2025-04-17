@@ -1,68 +1,72 @@
-import express from "express";
-import cors from "cors";
-import multer from "multer";
-import path from "path";
-import fs from "fs";
-import pool from './db';  // pastikan import ini benar
+import express from 'express';
+import multer from 'multer';
+import path from 'path';
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-app.use(cors());
-app.use(express.json());
-
-const uploadDir = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-}
-
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, uploadDir),
-  filename: (_req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + "-" + file.originalname);
-  },
+// Setup multer untuk menyimpan file
+const upload = multer({
+  dest: 'uploads/', // folder tempat menyimpan file yang diupload
+  limits: { fileSize: 5 * 1024 * 1024 }, // maksimal ukuran file 5MB
 });
 
-const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB
+// Middleware untuk menerima JSON dan URL-encoded data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Route untuk upload file
-app.post("/upload", upload.single("foto"), function (req, res) {
-  const file = req.file as Express.Multer.File | undefined;
-
-  if (!file) {
-    res.status(400).json({ message: "No file uploaded." });
-    return;
+// Endpoint untuk menangani upload flyer
+app.post('/upload', upload.single('foto'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: 'Foto tidak ditemukan!' });
   }
 
-  res.json({
-    message: "File uploaded successfully.",
-    filename: file.filename,
-    path: `/uploads/${file.filename}`,
+  const { nama, judul_materi, tanggal, tempat, waktu } = req.body;
+
+  // Simpan data ke database atau file sistem
+  // Misalnya menyimpan data di log (ganti dengan database)
+  console.log({
+    nama,
+    judul_materi,
+    tanggal,
+    tempat,
+    waktu,
+    foto: req.file.filename,
+  });
+
+  // Kirim respon sukses
+  res.status(200).json({
+    message: 'Flyer berhasil diupload!',
+    data: { nama, judul_materi, tanggal, tempat, waktu, foto: req.file.filename },
   });
 });
 
-// Static file serving
-app.use("/uploads", express.static(uploadDir));
-
-// Route untuk cek koneksi database
-app.get('/test-db', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT NOW()');
-    res.json({
-      success: true,
-      time: result.rows[0].now,
-    });
-  } catch (err: any) {  // Menangani error dengan tipe 'any'
-    console.error(err);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// Menjalankan server
+// Jalankan server
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server berjalan di http://localhost:${port}`);
+});
+import mysql from 'mysql2';
+
+// Membuat koneksi database
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: 'password',
+  database: 'kombel_ice_saf',
 });
 
-// Ekspor untuk keperluan Vercel
-export default app;
+// Menyimpan data ke database setelah upload
+app.post('/upload', upload.single('foto'), (req, res) => {
+  const { nama, judul_materi, tanggal, tempat, waktu } = req.body;
+  const foto = req.file.filename;
+
+  const query = 'INSERT INTO flyers (nama, judul_materi, tanggal, tempat, waktu, foto) VALUES (?, ?, ?, ?, ?, ?)';
+
+  connection.query(query, [nama, judul_materi, tanggal, tempat, waktu, foto], (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: 'Gagal menyimpan ke database', error: err });
+    }
+
+    res.status(200).json({ message: 'Flyer berhasil diupload!', data: { nama, judul_materi, tanggal, tempat, waktu, foto } });
+  });
+});
