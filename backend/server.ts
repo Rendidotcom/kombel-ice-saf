@@ -3,6 +3,7 @@ import cors from "cors";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import pool from './db';  // pastikan import ini benar
 
 const app = express();
 const port = 3000;
@@ -25,6 +26,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB
 
+// Route untuk upload file
 app.post("/upload", upload.single("foto"), function (req, res) {
   const file = req.file as Express.Multer.File | undefined;
 
@@ -40,11 +42,27 @@ app.post("/upload", upload.single("foto"), function (req, res) {
   });
 });
 
+// Static file serving
 app.use("/uploads", express.static(uploadDir));
 
+// Route untuk cek koneksi database
+app.get('/test-db', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT NOW()');
+    res.json({
+      success: true,
+      time: result.rows[0].now,
+    });
+  } catch (err: any) {  // Menangani error dengan tipe 'any'
+    console.error(err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Menjalankan server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
 
-// Tambahkan ekspor default agar bisa digunakan di Vercel
+// Ekspor untuk keperluan Vercel
 export default app;

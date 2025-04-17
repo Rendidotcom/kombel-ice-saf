@@ -2,19 +2,15 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Kombel ICE SAF - Flyer</title>
-  <style>
-    body { font-family: sans-serif; text-align: center; padding: 20px; }
-    .flyer { border: 1px solid #ccc; margin: 10px auto; padding: 10px; width: 300px; }
-    .flyer img { width: 100%; height: auto; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flyer Acara Kombel ICE SAF</title>
 </head>
 <body>
   <h1>Flyer Acara Kombel ICE SAF</h1>
   <div id="flyer-container"></div>
 
   <script>
-    fetch("http://localhost:3000/flyer")
+    fetch("/flyer")
       .then(res => res.json())
       .then(data => {
         const container = document.getElementById("flyer-container");
@@ -22,12 +18,14 @@
           const el = document.createElement("div");
           el.className = "flyer";
           el.innerHTML = `
-            <img src="http://localhost:3000/uploads/${f.foto}" alt="Flyer">
-            <h3>${f.judul_materi}</h3>
-            <p><strong>Nama:</strong> ${f.nama}</p>
-            <p><strong>Tanggal:</strong> ${f.tanggal}</p>
-            <p><strong>Waktu:</strong> ${f.waktu}</p>
-            <p><strong>Tempat:</strong> ${f.tempat}</p>
+            <img src="/uploads/${f.foto}" alt="Flyer">
+            <div class="flyer-content">
+              <h3>${f.judul_materi}</h3>
+              <p><strong>Nama:</strong> ${f.nama}</p>
+              <p><strong>Tanggal:</strong> ${f.tanggal}</p>
+              <p><strong>Waktu:</strong> ${f.waktu}</p>
+              <p><strong>Tempat:</strong> ${f.tempat}</p>
+            </div>
           `;
           container.appendChild(el);
         });
