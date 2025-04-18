@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Daftar Flyer - Kombel ICE SAF</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f2f5;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .card {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.02);
+    }
+
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .card-body {
+      padding: 15px;
+    }
+
+    .card-body h3 {
+      margin: 0;
+      color: #2c3e50;
+    }
+
+    .card-body p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Daftar Flyer Kombel ICE SAF</h1>
+  <div class="grid" id="flyerGrid"></div>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+    const supabase = createClient(
+      'https://jmmqpqbpdmaelfnjhgly.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptbXFwcWJwZG1hZWxmbmpoZ2x5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NDg2OTU3MiwiZXhwIjoyMDYwNDQ1NTcyfQ.zgMx01d27LlvSdteA4hDEbT_EFCkdxlKhlBbxb5A0fE'
+    );
+
+    const { data, error } = await supabase
+      .from("flyers")
+      .select("*")
+      .order("tanggal", { ascending: false });
+
+    if (error) {
+      console.error("Gagal mengambil data flyer:", error);
+      alert("Gagal memuat data flyer.");
+    } else {
+      const container = document.getElementById("flyerGrid");
+
+      data.forEach(item => {
+        const imageUrl = `https://jmmqpqbpdmaelfnjhgly.supabase.co/storage/v1/object/public/flyers/${item.flyer_url}`;
+
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+          <img src="${imageUrl}" alt="Flyer">
+          <div class="card-body">
+            <h3>${item.judul}</h3>
+            <p><strong>Pemateri:</strong> ${item.nama}</p>
+            <p><strong>Tanggal:</strong> ${item.tanggal}</p>
+            <p><strong>Tempat:</strong> ${item.tempat}</p>
+            <p><strong>Waktu:</strong> ${item.waktu}</p>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+  </script>
+</body>
+</html>
