@@ -72,7 +72,6 @@
     <button type="submit">Kirim</button>
   </form>
 
-  <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
   <script>
     const supabase = supabase.createClient(
@@ -95,35 +94,40 @@
         return;
       }
 
-      const filename = `${Date.now()}_${file.name}`;
-      const { error: uploadError } = await supabase.storage
-        .from("flyers")
-        .upload(filename, file);
+      try {
+        const filename = `${Date.now()}_${file.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from("flyers")
+          .upload(filename, file);
 
-      if (uploadError) {
-        alert("Gagal upload flyer: " + uploadError.message);
-        return;
-      }
+        if (uploadError) {
+          console.error("Upload error:", uploadError);
+          alert("Gagal upload flyer: " + uploadError.message);
+          return;
+        }
 
-      // Simpan ke database
-      const { error: insertError } = await supabase.from('flyers').insert([
-        {
+        const { error: insertError } = await supabase.from('flyers').insert([{
           nama,
           judul,
           tanggal,
           tempat,
           waktu,
           flyer_url: filename
+        }]);
+
+        if (insertError) {
+          console.error("Insert error:", insertError);
+          alert("Gagal menyimpan data ke database: " + insertError.message);
+          return;
         }
-      ]);
 
-      if (insertError) {
-        alert("Gagal menyimpan data ke database: " + insertError.message);
-        return;
+        alert("Flyer berhasil diupload!");
+        e.target.reset();
+
+      } catch (err) {
+        console.error("Unexpected error:", err);
+        alert("Terjadi kesalahan tak terduga: " + err.message);
       }
-
-      alert("Flyer berhasil diupload!");
-      e.target.reset();
     });
   </script>
 </body>
