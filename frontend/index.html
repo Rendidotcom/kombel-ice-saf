@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Download Sertifikat ICE SAF</title>
   <style>
     body {
@@ -56,12 +55,7 @@
 <body>
   <div class="container">
     <h2>Download Sertifikat Anda</h2>
-    <input
-      type="email"
-      id="email"
-      placeholder="Masukkan Email Anda"
-      required
-    />
+    <input type="email" id="email" placeholder="Masukkan Email Anda" required />
     <br />
     <button id="btn" onclick="downloadCertificate()">Cek &amp; Download</button>
     <div id="message"></div>
@@ -85,7 +79,6 @@
       btn.textContent = 'Memproses...';
 
       try {
-        // Tetap gunakan endpoint relatif
         const response = await fetch(`/api/certificate?email=${encodeURIComponent(email)}`);
         if (!response.ok) {
           msg.textContent = response.status === 404
@@ -95,23 +88,19 @@
           return;
         }
 
-        const arrayBuffer = await response.arrayBuffer();
-        const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
-        const blobUrl = URL.createObjectURL(blob);
-
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.href = blobUrl;
+        link.href = url;
         link.download = `sertifikat-${email}.pdf`;
-        document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(blobUrl);
+        URL.revokeObjectURL(url);
 
-        msg.textContent = 'Berhasil! Sertifikat sedang diunduh…';
+        msg.textContent = '✅ Sertifikat berhasil diunduh!';
         msg.classList.add('success');
       } catch (err) {
         console.error(err);
-        msg.textContent = 'Terjadi kesalahan jaringan. Cek koneksi Anda.';
+        msg.textContent = '❌ Terjadi kesalahan jaringan.';
         msg.classList.add('error');
       } finally {
         btn.disabled = false;
