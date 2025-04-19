@@ -104,7 +104,7 @@
 
       const { data, error } = await supabase.storage
         .from('certificates')
-        .list(null, {
+        .list('', {
           limit: 100,
           offset: 0,
           sortBy: { column: 'name', order: 'asc' },
@@ -112,6 +112,7 @@
 
       if (error || !data) {
         message.textContent = "Gagal mengambil daftar file.";
+        console.error(error);
         return;
       }
 
