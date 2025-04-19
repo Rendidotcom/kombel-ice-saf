@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Download Sertifikat ICE SAF</title>
+  <title>Download Sertifikat ICE SAF</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -73,7 +73,6 @@
       const msg = document.getElementById('message');
       const email = document.getElementById('email').value.trim();
 
-      // reset pesan
       msg.textContent = '';
       msg.className = '';
       if (!email) {
@@ -86,27 +85,20 @@
       btn.textContent = 'Memproses...';
 
       try {
-        const response = await fetch(
-          `/api/certificate?email=${encodeURIComponent(email)}`
-        );
-
+        // Tetap gunakan endpoint relatif
+        const response = await fetch(`/api/certificate?email=${encodeURIComponent(email)}`);
         if (!response.ok) {
-          // tangani error HTTP
-          if (response.status === 404) {
-            msg.textContent = 'Sertifikat untuk email ini tidak ditemukan.';
-          } else {
-            msg.textContent = 'Terjadi kesalahan server. Silakan coba lagi.';
-          }
+          msg.textContent = response.status === 404
+            ? 'Sertifikat untuk email ini tidak ditemukan.'
+            : 'Terjadi kesalahan server. Silakan coba lagi.';
           msg.classList.add('error');
           return;
         }
 
-        // baca PDF sebagai ArrayBuffer kemudian buat Blob
         const arrayBuffer = await response.arrayBuffer();
         const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
         const blobUrl = URL.createObjectURL(blob);
 
-        // buat link download dan klik
         const link = document.createElement('a');
         link.href = blobUrl;
         link.download = `sertifikat-${email}.pdf`;
