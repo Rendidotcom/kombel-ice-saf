@@ -64,6 +64,9 @@
       background: #28a745;
       padding: 5px 10px;
       font-size: 0.9rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -83,7 +86,7 @@
     const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptbXFwcWJwZG1hZWxmbmpoZ2x5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NDg2OTU3MiwiZXhwIjoyMDYwNDQ1NTU3Mn0.zgMx01d27LlvSdteA4hDEbT_EFCkdxlKhlBbxb5A0fE";
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    async function loadCertificates() {
+    window.loadCertificates = async function () {
       const emailInput = document.getElementById("email");
       const email = emailInput.value.trim();
       const message = document.getElementById("message");
@@ -99,11 +102,13 @@
 
       const encodedEmail = email.replace(/[@.]/g, '_');
 
-      const { data, error } = await supabase.storage.from('certificates').list('', {
-        limit: 100,
-        offset: 0,
-        sortBy: { column: 'name', order: 'asc' },
-      });
+      const { data, error } = await supabase.storage
+        .from('certificates')
+        .list('', {
+          limit: 100,
+          offset: 0,
+          sortBy: { column: 'name', order: 'asc' },
+        });
 
       if (error || !data) {
         message.textContent = "Gagal mengambil daftar file.";
@@ -121,10 +126,16 @@
         const fileUrl = `${supabaseUrl}/storage/v1/object/public/certificates/${file.name}`;
         const item = document.createElement("div");
         item.className = "file-item";
-        item.innerHTML = `
-          <span>${file.name}</span>
-          <button onclick="window.open('${fileUrl}', '_blank')">Download</button>
-        `;
+
+        const span = document.createElement("span");
+        span.textContent = file.name;
+
+        const button = document.createElement("button");
+        button.textContent = "Download";
+        button.onclick = () => window.open(fileUrl, "_blank");
+
+        item.appendChild(span);
+        item.appendChild(button);
         fileList.appendChild(item);
       });
     }
