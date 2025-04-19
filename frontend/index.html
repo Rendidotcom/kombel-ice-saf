@@ -1,124 +1,49 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Download Sertifikat</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+async function downloadCertificate() {
+  const btn = document.getElementById('btn');
+  const msg = document.getElementById('message');
+  const email = document.getElementById('email').value.trim();
+
+  msg.textContent = '';
+  msg.className = '';
+  if (!email) {
+    msg.textContent = 'Email wajib diisi!';
+    msg.classList.add('error');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Memproses...';
+
+  try {
+    const encodedEmail = email.replace(/[^a-zA-Z0-9]/g, '_'); // fix here
+    const fileUrl = `https://jmmqpqbpdmaelfnjhgly.supabase.co/storage/v1/object/public/certificates/${encodedEmail}.pdf`;
+
+    const response = await fetch(fileUrl);
+    if (!response.ok) {
+      msg.textContent = 'Sertifikat untuk email ini tidak ditemukan.';
+      msg.classList.add('error');
+      return;
     }
-    .container {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      text-align: center;
-      width: 100%;
-      max-width: 360px;
-    }
-    input[type="email"] {
-      width: calc(100% - 2rem);
-      padding: 0.75rem;
-      margin-bottom: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 1rem;
-    }
-    button {
-      background: #28a745;
-      color: #fff;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:disabled {
-      background: #aaa;
-      cursor: not-allowed;
-    }
-    #message {
-      margin-top: 1rem;
-      font-size: 0.95rem;
-      min-height: 1.2em;
-    }
-    #message.error { color: #c00; }
-    #message.success { color: #080; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>Download Sertifikat Anda</h2>
-    <input
-      type="email"
-      id="email"
-      placeholder="Masukkan Email Anda"
-      required
-    />
-    <br />
-    <button id="btn" onclick="downloadCertificate()">Cek &amp; Download</button>
-    <div id="message"></div>
-  </div>
 
-  <script>
-    async function downloadCertificate() {
-      const btn = document.getElementById('btn');
-      const msg = document.getElementById('message');
-      const email = document.getElementById('email').value.trim();
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
 
-      msg.textContent = '';
-      msg.className = '';
-      if (!email) {
-        msg.textContent = 'Email wajib diisi!';
-        msg.classList.add('error');
-        return;
-      }
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `sertifikat-${email}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 
-      btn.disabled = true;
-      btn.textContent = 'Memproses...';
-
-      try {
-        // Ganti titik dan @ dengan _
-        const encodedEmail = email.replace(/[@.]/g, '_');
-        const fileUrl = `https://jmmqpqbpdmaelfnjhgly.supabase.co/storage/v1/object/public/certificates/${encodedEmail}.pdf`;
-
-        // Coba fetch file
-        const response = await fetch(fileUrl);
-        if (!response.ok) {
-          msg.textContent = 'Sertifikat untuk email ini tidak ditemukan.';
-          msg.classList.add('error');
-          return;
-        }
-
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `sertifikat-${email}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-
-        msg.textContent = 'Berhasil! Sertifikat sedang diunduh…';
-        msg.classList.add('success');
-      } catch (err) {
-        console.error(err);
-        msg.textContent = 'Terjadi kesalahan saat mengunduh.';
-        msg.classList.add('error');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Cek & Download';
-      }
-    }
-  </script>
-</body>
-</html>
+    msg.textContent = 'Berhasil! Sertifikat sedang diunduh…';
+    msg.classList.add('success');
+  } catch (err) {
+    console.error(err);
+    msg.textContent = 'Terjadi kesalahan saat mengunduh.';
+    msg.classList.add('error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Cek & Download';
+  }
+}
