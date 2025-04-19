@@ -1,63 +1,71 @@
-// api/certificate.ts
+// pages/api/certificate.ts
 
-import { VercelRequest, VercelResponse } from '@vercel/node';
-import { createClient } from '@supabase/supabase-js';
-import https from 'https';
-import csv from 'csv-parser';
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { createClient } from '@supabase/supabase-js'
 
-// Supabase config
 const supabase = createClient(
-  'https://jmmqpqbpdmaelfnjhgly.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptbXFwcWJwZG1hZWxmbmpoZ2x5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ4Njk1NzIsImV4cCI6MjA2MDQ0NTU3Mn0.853Yt-zBeLUZeosgS9Df5pYVEklqcprK-PS_1Zgtb4Q'
-);
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_ANON_KEY!
+)
 
-// Google Sheets CSV link
+// URL CSV hasil "Publish to web" Google Sheets
 const CSV_URL =
-  'https://docs.google.com/spreadsheets/d/e/2PACX-1vTQ_JgGIZA2_DTZZJ7Hk5YRQIfEwOAllszcYiiZmE3o4XmnCIvgQuH6nsUt98LevnoPaPY8wHBD_yyL/pub?gid=907933854&single=true&output=csv';
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vTQ_JgGIZA2_DTZZJ7Hk5YRQIfEwOAllszcYiiZmE3o4XmnCIvgQuH6nsUt98LevnoPaPY8wHBD_yyL/pub?gid=907933854&single=true&output=csv'
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const email = (req.query.email as string)?.trim().toLowerCase();
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const emailParam = req.query.email
+  const email = Array.isArray(emailParam) ? emailParam[0] : emailParam
   if (!email) {
-    return res.status(400).json({ error: 'Email tidak valid' });
+    return res.status(400).json({ error: 'Email is required' })
   }
-
-  let match: { [key: string]: string } | null = null;
+  const emailLower = email.trim().toLowerCase()
 
   try {
-    await new Promise<void>((resolve, reject) => {
-      https.get(CSV_URL, (response) => {
-        response
-          .pipe(csv())
-          .on('data', (row) => {
-            if (row['Email']?.trim().toLowerCase() === email) {
-              match = row;
-            }
-          })
-          .on('end', resolve)
-          .on('error', reject);
-      }).on('error', reject);
-    });
-  } catch (err) {
-    console.error('Gagal membaca CSV:', err);
-    return res.status(500).json({ error: 'Gagal membaca data peserta.' });
+    // 1. Fetch CSV & parse
+    const csvRes = await fetch(CSV_URL)
+    if (!csvRes.ok) throw new Error('Failed to fetch participant data')
+    const csvText = await csvRes.text()
+    const lines = csvText.trim().split('\n')
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase())
+
+    const emailIdx = headers.findIndex(h => h.includes('email'))
+    const fileIdx  = headers.findIndex(h => h.includes('file'))
+    if (emailIdx < 0) throw new Error('CSV missing "Email" column')
+    if (fileIdx  < 0) throw new Error('CSV missing "File" column')
+
+    let fileName: string | undefined
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(',')
+      if (cols[emailIdx].trim().toLowerCase() === emailLower) {
+        fileName = cols[fileIdx].trim()
+        break
+      }
+    }
+    if (!fileName) {
+      return res.status(404).json({ error: 'Email not found' })
+    }
+
+    // 2. Generate signed URL & fetch PDF
+    const { data: signedData, error: signedErr } =
+      await supabase.storage.from('certificates').createSignedUrl(fileName, 60)
+    if (signedErr || !signedData?.signedUrl) {
+      return res.status(404).json({ error: 'Certificate not found in storage' })
+    }
+    const fileRes = await fetch(signedData.signedUrl)
+    if (!fileRes.ok) throw new Error('Failed to download certificate')
+
+    // 3. Send PDF
+    const arrayBuffer = await fileRes.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+    res.setHeader('Content-Type', 'application/pdf')
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${fileName}"`
+    )
+    res.send(buffer)
+
+  } catch (err: any) {
+    console.error('[/api/certificate] error:', err)
+    res.status(500).json({ error: err.message || 'Internal server error' })
   }
-
-  if (!match) {
-    return res.status(404).json({ error: 'Email tidak ditemukan.' });
-  }
-
-  // Nama file sertifikat di Supabase (gunakan email sebagai nama file)
-  const filePath = `${email}.pdf`; // pastikan file ini sudah diunggah ke bucket 'certificates'
-
-  const { data, error } = await supabase.storage
-    .from('certificates')
-    .download(filePath);
-
-  if (error || !data) {
-    return res.status(404).json({ error: 'Sertifikat tidak ditemukan di Supabase.' });
-  }
-
-  res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', `attachment; filename="${filePath}"`);
-  data.pipe(res);
 }
