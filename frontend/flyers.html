@@ -84,7 +84,6 @@
       background-color: #0056b3;
     }
 
-    /* Fullscreen Modal */
     .modal {
       display: none;
       position: fixed;
@@ -112,7 +111,6 @@
   <h1>Flyer Kegiatan ICE SAF</h1>
   <div class="flyer-grid" id="flyerGrid"></div>
 
-  <!-- Modal Zoom -->
   <div class="modal" id="modal">
     <img id="modalImg" src="" />
   </div>
@@ -126,11 +124,11 @@
     );
 
     const flyerGrid = document.getElementById("flyerGrid");
-    const logoURL = "https://jmmqpqbpdmaelfnjhgly.supabase.co/storage/v1/object/public/flyers//LOGO%20ICE%20SAF%20BG%20BLACK.png"; // Ganti dengan URL logo yang kamu upload
-    const daftarURL = "https://docs.google.com/forms/d/e/1FAIpQLSd_LLWrKhyFnR1O79tmANB6tjxw9GJrHlQ-vkGTiLFM9UbU4Q/viewform?usp=header";
-
     const modal = document.getElementById("modal");
     const modalImg = document.getElementById("modalImg");
+
+    const logoURL = "https://jmmqpqbpdmaelfnjhgly.supabase.co/storage/v1/object/public/flyers//LOGO%20ICE%20SAF%20BG%20BLACK.png";
+    const daftarURL = "https://docs.google.com/forms/d/e/1FAIpQLSdNOC8FuXcupj0QU-Y-TP-w4IncAKSPsCiN8gt_sGXZaa6XaQ/viewform?usp=dialog";
 
     const warna = ['#e3f2fd', '#ffe0b2', '#f3e5f5', '#e8f5e9', '#fff3e0', '#e1f5fe'];
 
@@ -186,7 +184,6 @@
     }
 
     modal.addEventListener("click", () => modal.classList.remove("show"));
-
     loadFlyers();
   </script>
 </body>
