@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Download Sertifikat ICE SAF</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      background: #f0f0f0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -14,98 +15,95 @@
       margin: 0;
     }
     .container {
-      background: #fff;
+      background: white;
       padding: 2rem;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       text-align: center;
       width: 100%;
       max-width: 360px;
     }
     input[type="email"] {
-      width: calc(100% - 2rem);
-      padding: 0.75rem;
-      margin-bottom: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      width: 100%;
+      padding: 10px;
       font-size: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
     button {
-      background: #28a745;
-      color: #fff;
-      border: none;
-      padding: 0.75rem 1.5rem;
+      padding: 10px 20px;
       font-size: 1rem;
-      border-radius: 4px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
       cursor: pointer;
     }
     button:disabled {
-      background: #aaa;
-      cursor: not-allowed;
+      background: #999;
     }
     #message {
       margin-top: 1rem;
-      font-size: 0.95rem;
-      min-height: 1.2em;
+      font-size: 0.9rem;
+      min-height: 1em;
     }
-    #message.error { color: #c00; }
-    #message.success { color: #080; }
+    #message.success { color: green; }
+    #message.error { color: red; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Download Sertifikat Anda</h2>
-    <input type="email" id="email" placeholder="Masukkan Email Anda" required />
-    <br />
-    <button id="btn" onclick="downloadCertificate()">Cek &amp; Download</button>
+    <h2>Unduh Sertifikat Anda</h2>
+    <input type="email" id="email" placeholder="Masukkan email Anda" required />
+    <button onclick="downloadCertificate()">Cek & Download</button>
     <div id="message"></div>
   </div>
 
   <script>
     async function downloadCertificate() {
-      const btn = document.getElementById('btn');
-      const msg = document.getElementById('message');
-      const email = document.getElementById('email').value.trim();
+      const emailInput = document.getElementById("email");
+      const message = document.getElementById("message");
+      const email = emailInput.value.trim();
 
-      msg.textContent = '';
-      msg.className = '';
+      message.textContent = "";
+      message.className = "";
+
       if (!email) {
-        msg.textContent = 'Email wajib diisi!';
-        msg.classList.add('error');
+        message.textContent = "Email wajib diisi!";
+        message.classList.add("error");
         return;
       }
 
-      btn.disabled = true;
-      btn.textContent = 'Memproses...';
+      const encoded = email.replace(/[@.]/g, '_');
+      const maxRow = 100; // Sesuaikan jika peserta lebih banyak
 
-      try {
-        const response = await fetch(`/api/certificate?email=${encodeURIComponent(email)}`);
-        if (!response.ok) {
-          msg.textContent = response.status === 404
-            ? 'Sertifikat untuk email ini tidak ditemukan.'
-            : 'Terjadi kesalahan server. Silakan coba lagi.';
-          msg.classList.add('error');
-          return;
+      for (let row = 1; row <= maxRow; row++) {
+        const fileName = `${encoded}_${row}.pdf`;
+        const url = `https://jmmqpqbpdmaelfnjhgly.supabase.co/storage/v1/object/public/certificates/${fileName}`;
+
+        try {
+          const res = await fetch(url);
+          if (res.status === 200) {
+            const blob = await res.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = blobUrl;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            message.textContent = "Sertifikat berhasil diunduh!";
+            message.classList.add("success");
+            return;
+          }
+        } catch (e) {
+          console.error(e);
         }
-
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `sertifikat-${email}.pdf`;
-        link.click();
-        URL.revokeObjectURL(url);
-
-        msg.textContent = '✅ Sertifikat berhasil diunduh!';
-        msg.classList.add('success');
-      } catch (err) {
-        console.error(err);
-        msg.textContent = '❌ Terjadi kesalahan jaringan.';
-        msg.classList.add('error');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Cek & Download';
       }
+
+      message.textContent = "Sertifikat tidak ditemukan. Pastikan email benar.";
+      message.classList.add("error");
     }
   </script>
 </body>
