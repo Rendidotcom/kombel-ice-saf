@@ -1,35 +1,131 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Flyer Acara Kombel ICE SAF</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Download Sertifikat ICE SAF</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 100%;
+      max-width: 360px;
+    }
+    input[type="email"] {
+      width: calc(100% - 2rem);
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    button {
+      background: #28a745;
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+    #message {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      min-height: 1.2em;
+    }
+    #message.error { color: #c00; }
+    #message.success { color: #080; }
+  </style>
 </head>
 <body>
-  <h1>Flyer Acara Kombel ICE SAF</h1>
-  <div id="flyer-container"></div>
+  <div class="container">
+    <h2>Download Sertifikat Anda</h2>
+    <input
+      type="email"
+      id="email"
+      placeholder="Masukkan Email Anda"
+      required
+    />
+    <br />
+    <button id="btn" onclick="downloadCertificate()">Cek &amp; Download</button>
+    <div id="message"></div>
+  </div>
 
   <script>
-    fetch("/flyer")
-      .then(res => res.json())
-      .then(data => {
-        const container = document.getElementById("flyer-container");
-        data.forEach(f => {
-          const el = document.createElement("div");
-          el.className = "flyer";
-          el.innerHTML = `
-            <img src="/uploads/${f.foto}" alt="Flyer">
-            <div class="flyer-content">
-              <h3>${f.judul_materi}</h3>
-              <p><strong>Nama:</strong> ${f.nama}</p>
-              <p><strong>Tanggal:</strong> ${f.tanggal}</p>
-              <p><strong>Waktu:</strong> ${f.waktu}</p>
-              <p><strong>Tempat:</strong> ${f.tempat}</p>
-            </div>
-          `;
-          container.appendChild(el);
-        });
-      });
+    async function downloadCertificate() {
+      const btn = document.getElementById('btn');
+      const msg = document.getElementById('message');
+      const email = document.getElementById('email').value.trim();
+
+      // reset pesan
+      msg.textContent = '';
+      msg.className = '';
+      if (!email) {
+        msg.textContent = 'Email wajib diisi!';
+        msg.classList.add('error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Memproses...';
+
+      try {
+        const response = await fetch(
+          `/api/certificate?email=${encodeURIComponent(email)}`
+        );
+
+        if (!response.ok) {
+          // tangani error HTTP
+          if (response.status === 404) {
+            msg.textContent = 'Sertifikat untuk email ini tidak ditemukan.';
+          } else {
+            msg.textContent = 'Terjadi kesalahan server. Silakan coba lagi.';
+          }
+          msg.classList.add('error');
+          return;
+        }
+
+        // baca PDF sebagai ArrayBuffer kemudian buat Blob
+        const arrayBuffer = await response.arrayBuffer();
+        const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+        const blobUrl = URL.createObjectURL(blob);
+
+        // buat link download dan klik
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = `sertifikat-${email}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+
+        msg.textContent = 'Berhasil! Sertifikat sedang diunduh…';
+        msg.classList.add('success');
+      } catch (err) {
+        console.error(err);
+        msg.textContent = 'Terjadi kesalahan jaringan. Cek koneksi Anda.';
+        msg.classList.add('error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Cek & Download';
+      }
+    }
   </script>
 </body>
 </html>
