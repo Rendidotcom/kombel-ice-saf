@@ -76,11 +76,12 @@
       }
 
       const encoded = email.replace(/[@.]/g, '_');
-      const maxRow = 100; // Sesuaikan jika peserta lebih banyak
+      const maxRow = 100;
+      let found = false;
 
       for (let row = 1; row <= maxRow; row++) {
         const fileName = `${encoded}_${row}.pdf`;
-        const url = `https://jmmqpqbpdmaelfnjhgly.supabase.co/storage/v1/object/public/certificates/${fileName}`;
+        const url = `https://jmmqpqbpdmaelfnjhgly.supabase.co/storage/v1/object/public/certificates/${encodeURIComponent(fileName)}`;
 
         try {
           const res = await fetch(url);
@@ -93,17 +94,21 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            message.textContent = "Sertifikat berhasil diunduh!";
-            message.classList.add("success");
-            return;
+            found = true;
+            await new Promise(resolve => setTimeout(resolve, 500)); // delay agar tidak diblokir Supabase
           }
         } catch (e) {
-          console.error(e);
+          console.error(`Gagal mengunduh ${fileName}`, e);
         }
       }
 
-      message.textContent = "Sertifikat tidak ditemukan. Pastikan email benar.";
-      message.classList.add("error");
+      if (found) {
+        message.textContent = "Semua sertifikat berhasil diunduh!";
+        message.classList.add("success");
+      } else {
+        message.textContent = "Sertifikat tidak ditemukan. Pastikan email benar.";
+        message.classList.add("error");
+      }
     }
   </script>
 </body>
