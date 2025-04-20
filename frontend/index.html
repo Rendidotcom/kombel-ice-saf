@@ -59,57 +59,60 @@
   <div class="container">
     <h2>Cek Sertifikat Anda</h2>
     <input type="email" id="email" placeholder="Masukkan email Anda" />
-    <button onclick="loadCertificates()">Tampilkan Sertifikat</button>
+    <button id="checkBtn">Tampilkan Sertifikat</button>
     <div class="error" id="error"></div>
     <div class="cert-list" id="certList"></div>
   </div>
 
   <script>
-    const supabaseUrl = 'https://jmmqpqbpdmaelfnjhgly.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptbXFwcWJwZG1hZWxmbmpoZ2x5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ4Njk1NzIsImV4cCI6MjA2MDQ0NTU3Mn0.853Yt-zBeLUZeosgS9Df5pYVEklqcprK-PS_1Zgtb4Q';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    document.addEventListener('DOMContentLoaded', () => {
+      const supabaseUrl = 'https://jmmqpqbpdmaelfnjhgly.supabase.co';
+      const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptbXFwcWJwZG1hZWxmbmpoZ2x5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ4Njk1NzIsImV4cCI6MjA2MDQ0NTU3Mn0.853Yt-zBeLUZeosgS9Df5pYVEklqcprK-PS_1Zgtb4Q';
+      const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    async function loadCertificates() {
-      const emailInput = document.getElementById("email");
-      const email = emailInput.value.trim().toLowerCase();
-      const errorDiv = document.getElementById("error");
-      const certList = document.getElementById("certList");
-      certList.innerHTML = "";
-      errorDiv.textContent = "";
+      async function loadCertificates() {
+        const emailInput = document.getElementById("email");
+        const email = emailInput.value.trim().toLowerCase();
+        const errorDiv = document.getElementById("error");
+        const certList = document.getElementById("certList");
+        certList.innerHTML = "";
+        errorDiv.textContent = "";
 
-      if (!email) {
-        errorDiv.textContent = "Email tidak boleh kosong.";
-        return;
+        if (!email) {
+          errorDiv.textContent = "Email tidak boleh kosong.";
+          return;
+        }
+
+        const safeEmail = email.replace(/@/g, "_at_").replace(/\./g, "_dot_");
+
+        const { data, error } = await supabase.storage
+          .from('certificates')
+          .list('', { limit: 100 });
+
+        if (error) {
+          errorDiv.textContent = "Gagal mengambil daftar file.";
+          console.error(error);
+          return;
+        }
+
+        const files = data.filter(file => file.name.startsWith(safeEmail));
+
+        if (files.length === 0) {
+          errorDiv.textContent = "Sertifikat tidak ditemukan.";
+          return;
+        }
+
+        files.forEach(file => {
+          const url = `${supabaseUrl}/storage/v1/object/public/certificates/${file.name}`;
+          const div = document.createElement("div");
+          div.className = "cert-item";
+          div.innerHTML = `<a href="${url}" target="_blank">${file.name}</a>`;
+          certList.appendChild(div);
+        });
       }
 
-      // Convert email to safe format
-      const safeEmail = email.replace(/@/g, "_at_").replace(/\./g, "_dot_");
-
-      const { data, error } = await supabase.storage
-        .from('certificates')
-        .list('', { limit: 100 });
-
-      if (error) {
-        errorDiv.textContent = "Gagal mengambil daftar file.";
-        console.error(error);
-        return;
-      }
-
-      const files = data.filter(file => file.name.startsWith(safeEmail));
-
-      if (files.length === 0) {
-        errorDiv.textContent = "Sertifikat tidak ditemukan.";
-        return;
-      }
-
-      files.forEach(file => {
-        const url = `${supabaseUrl}/storage/v1/object/public/certificates/${file.name}`;
-        const div = document.createElement("div");
-        div.className = "cert-item";
-        div.innerHTML = `<a href="${url}" target="_blank">${file.name}</a>`;
-        certList.appendChild(div);
-      });
-    }
+      document.getElementById("checkBtn").addEventListener("click", loadCertificates);
+    });
   </script>
 </body>
 </html>
