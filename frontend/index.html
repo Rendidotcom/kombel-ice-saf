@@ -83,8 +83,6 @@
           return;
         }
 
-        const safeEmail = email.replace(/@/g, "_at_").replace(/\./g, "_dot_");
-
         const { data, error } = await supabase.storage
           .from('certificates')
           .list('', { limit: 100 });
@@ -95,7 +93,7 @@
           return;
         }
 
-        const files = data.filter(file => file.name.startsWith(safeEmail));
+        const files = data.filter(file => file.name.toLowerCase().startsWith(email));
 
         if (files.length === 0) {
           errorDiv.textContent = "Sertifikat tidak ditemukan.";
