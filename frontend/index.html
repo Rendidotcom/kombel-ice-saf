@@ -10,52 +10,46 @@
       background: #f0f0f0;
       display: flex;
       justify-content: center;
-      align-items: center;
-      height: 100vh;
+      align-items: start;
+      min-height: 100vh;
+      padding: 2rem;
       margin: 0;
     }
     .container {
-      background: #fff;
+      background: white;
       padding: 2rem;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      text-align: center;
+      max-width: 480px;
       width: 100%;
-      max-width: 360px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     input[type="email"] {
-      width: calc(100% - 2rem);
-      padding: 0.75rem;
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
       margin-bottom: 1rem;
       border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 1rem;
+      border-radius: 5px;
     }
     button {
-      background: #28a745;
-      color: #fff;
-      border: none;
-      padding: 0.75rem 1.5rem;
+      padding: 10px 20px;
       font-size: 1rem;
-      border-radius: 4px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
       cursor: pointer;
     }
     button:disabled {
-      background: #aaa;
-      cursor: not-allowed;
+      background: #999;
     }
     #message {
       margin-top: 1rem;
-      font-size: 0.95rem;
-      min-height: 1.2em;
+      font-size: 0.9rem;
+      color: red;
     }
-    #message.error { color: #c00; }
-    #message.success { color: #080; }
     .file-list {
       margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
     .file-item {
       padding: 10px;
@@ -65,8 +59,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      width: 100%;
-      max-width: 320px;
     }
     .file-item button {
       background: #28a745;
@@ -81,81 +73,81 @@
 <body>
   <div class="container">
     <h2>Cek Sertifikat Anda</h2>
-    <input type="email" id="email" placeholder="Masukkan email Anda" required />
-    <br />
+    <input type="email" id="email" placeholder="Masukkan email Anda" />
     <button id="btn" onclick="loadCertificates()">Tampilkan Sertifikat</button>
     <div id="message"></div>
     <div class="file-list" id="fileList"></div>
   </div>
 
-  <script>
-    async function loadCertificates() {
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const supabaseUrl = 'https://jmmqpqbpdmaelfnjhgly.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptbXFwcWJwZG1hZWxmbmpoZ2x5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NDg2OTU3MiwiZXhwIjoyMDYwNDQ1NTU3Mn0.zgMx01d27LlvSdteA4hDEbT_EFCkdxlKhlBbxb5A0fE';
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    window.loadCertificates = async () => {
+      const email = document.getElementById('email').value.trim();
       const btn = document.getElementById('btn');
       const msg = document.getElementById('message');
-      const email = document.getElementById('email').value.trim();
       const fileList = document.getElementById('fileList');
-      fileList.innerHTML = '';
-      
+
       msg.textContent = '';
-      msg.className = '';
+      fileList.innerHTML = '';
 
       if (!email) {
         msg.textContent = 'Email wajib diisi!';
-        msg.classList.add('error');
         return;
       }
-
-      const encodedEmail = email.replace(/[^a-zA-Z0-9]/g, '_'); // fix here
 
       btn.disabled = true;
       btn.textContent = 'Memproses...';
 
-      try {
-        // List semua file dari bucket "certificates"
-        const { data, error } = await fetch(`https://jmmqpqbpdmaelfnjhgly.supabase.co/storage/v1/object/list/certificates`)
-          .then(res => res.json());
+      // encode semua karakter non-alphanumeric jadi underscore
+      const encodedEmail = email.replace(/[^a-zA-Z0-9]/g, '_');
 
-        if (error || !data) {
-          msg.textContent = 'Gagal mengambil daftar file.';
-          return;
-        }
+      // pakai SDK list dengan path ''
+      const { data, error } = await supabase
+        .storage
+        .from('certificates')
+        .list('', { limit: 200, offset: 0, sortBy: { column: 'name', order: 'asc' } });
 
-        const matchedFiles = data.filter(file => file.name.startsWith(encodedEmail));
-
-        if (matchedFiles.length === 0) {
-          msg.textContent = 'Sertifikat tidak ditemukan.';
-          return;
-        }
-
-        // Tampilkan file-file sertifikat
-        matchedFiles.forEach(file => {
-          const fileUrl = `https://jmmqpqbpdmaelfnjhgly.supabase.co/storage/v1/object/public/certificates/${file.name}`;
-          const item = document.createElement("div");
-          item.className = "file-item";
-
-          const span = document.createElement("span");
-          span.textContent = file.name;
-
-          const button = document.createElement("button");
-          button.textContent = "Download";
-          button.onclick = () => window.open(fileUrl, "_blank");
-
-          item.appendChild(span);
-          item.appendChild(button);
-          fileList.appendChild(item);
-        });
-
-        msg.textContent = 'Berhasil! Sertifikat siap diunduh.';
-        msg.classList.add('success');
-      } catch (err) {
-        console.error(err);
-        msg.textContent = 'Terjadi kesalahan saat mengunduh data.';
-        msg.classList.add('error');
-      } finally {
+      if (error) {
+        console.error(error);
+        msg.textContent = 'Gagal mengambil daftar file.';
         btn.disabled = false;
         btn.textContent = 'Tampilkan Sertifikat';
+        return;
       }
-    }
+
+      const matched = data.filter(f => f.name.startsWith(encodedEmail));
+      if (!matched.length) {
+        msg.textContent = 'Sertifikat tidak ditemukan.';
+        btn.disabled = false;
+        btn.textContent = 'Tampilkan Sertifikat';
+        return;
+      }
+
+      matched.forEach(f => {
+        const url = `${supabaseUrl}/storage/v1/object/public/certificates/${f.name}`;
+        const item = document.createElement('div');
+        item.className = 'file-item';
+
+        const span = document.createElement('span');
+        span.textContent = f.name;
+
+        const dl = document.createElement('button');
+        dl.textContent = 'Download';
+        dl.onclick = () => window.open(url, '_blank');
+
+        item.append(span, dl);
+        fileList.appendChild(item);
+      });
+
+      msg.textContent = '';
+      btn.disabled = false;
+      btn.textContent = 'Tampilkan Sertifikat';
+    };
   </script>
 </body>
 </html>
