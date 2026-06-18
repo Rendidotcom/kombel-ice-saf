@@ -10,6 +10,9 @@ const uploadForm = document.getElementById("uploadForm");
 uploadForm.addEventListener("submit", async (event) => {
 
 event.preventDefault();
+  
+console.log("SUBMIT CLICKED");
+console.log("API:", API_URL);
 
 try {
 
