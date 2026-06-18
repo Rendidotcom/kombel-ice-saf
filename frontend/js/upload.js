@@ -1,5 +1,7 @@
 "use strict";
 
+alert("UPLOAD JS LOADED");
+
 const API_URL =
 "https://script.google.com/macros/s/AKfycbyh4Jcs0jjFXo_c348m7Ycz1Qt5IkmWwwRDeSONtcFg4Vr7kAJvrKksB2rzj2UwjjAoiA/exec";
 
