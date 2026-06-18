@@ -1,5 +1,5 @@
+```html
 <!DOCTYPE html>
-
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -97,7 +97,6 @@
       font-weight: bold;
     }
   </style>
-
 </head>
 
 <body>
@@ -110,201 +109,69 @@
 
   <div class="container">
 
-```
-<h1>Upload Flyer Baru</h1>
+    <h1>Upload Flyer Baru</h1>
 
-<form id="uploadForm">
+    <form id="uploadForm">
 
-  <label for="nama">Nama Pemateri</label>
-  <input
-    type="text"
-    id="nama"
-    required
-  >
+      <label for="nama">Nama Pemateri</label>
+      <input
+        type="text"
+        id="nama"
+        required
+      >
 
-  <label for="judul_materi">Judul Materi</label>
-  <input
-    type="text"
-    id="judul_materi"
-    required
-  >
+      <label for="judul_materi">Judul Materi</label>
+      <input
+        type="text"
+        id="judul_materi"
+        required
+      >
 
-  <label for="tanggal">Tanggal Pelaksanaan</label>
-  <input
-    type="date"
-    id="tanggal"
-    required
-  >
+      <label for="tanggal">Tanggal Pelaksanaan</label>
+      <input
+        type="date"
+        id="tanggal"
+        required
+      >
 
-  <label for="tempat">Tempat Pelaksanaan</label>
-  <input
-    type="text"
-    id="tempat"
-    required
-  >
+      <label for="tempat">Tempat Pelaksanaan</label>
+      <input
+        type="text"
+        id="tempat"
+        required
+      >
 
-  <label for="waktu">Waktu Pelaksanaan</label>
-  <input
-    type="text"
-    id="waktu"
-    placeholder="Contoh: 08:00 - 10:00"
-    required
-  >
+      <label for="waktu">Waktu Pelaksanaan</label>
+      <input
+        type="text"
+        id="waktu"
+        placeholder="Contoh: 08:00 - 10:00"
+        required
+      >
 
-  <label for="foto">Upload Flyer</label>
-  <input
-    type="file"
-    id="foto"
-    accept="image/*"
-    required
-  >
+      <label for="foto">Upload Flyer</label>
+      <input
+        type="file"
+        id="foto"
+        accept="image/*"
+        required
+      >
 
-  <button
-    type="submit"
-    id="submitBtn"
-  >
-    Kirim Flyer
-  </button>
+      <button
+        type="submit"
+        id="submitBtn"
+      >
+        Kirim Flyer
+      </button>
 
-</form>
+    </form>
 
-<div id="status"></div>
-```
+    <div id="status"></div>
 
   </div>
 
-  <script>
-
-    const WEBAPP_URL =
-      "https://script.google.com/macros/s/AKfycbzfDx5V6PgXMxZJhvMxOMp6JVjo4BNFHaBZM3AKcoNisyWOh9QWoADZxzZxsyp1EBWQHQ/exec";
-
-    const form =
-      document.getElementById("uploadForm");
-
-    const statusBox =
-      document.getElementById("status");
-
-    const submitBtn =
-      document.getElementById("submitBtn");
-
-    form.addEventListener("submit", async (e) => {
-
-      e.preventDefault();
-
-      const nama =
-        document.getElementById("nama").value.trim();
-
-      const judul =
-        document.getElementById("judul_materi").value.trim();
-
-      const tanggal =
-        document.getElementById("tanggal").value;
-
-      const tempat =
-        document.getElementById("tempat").value.trim();
-
-      const waktu =
-        document.getElementById("waktu").value.trim();
-
-      const file =
-        document.getElementById("foto").files[0];
-
-      if (!file) {
-        alert("Pilih flyer terlebih dahulu.");
-        return;
-      }
-
-      submitBtn.disabled = true;
-      statusBox.textContent = "⏳ Mengupload flyer...";
-
-      try {
-
-        const imageBase64 =
-          await fileToBase64(file);
-
-        const payload = {
-          nama,
-          judul,
-          tanggal,
-          tempat,
-          waktu,
-          fileName: file.name,
-          mimeType: file.type,
-          image: imageBase64
-        };
-
-        const response =
-          await fetch(WEBAPP_URL, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-          });
-
-        const result =
-          await response.json();
-
-        if (result.success) {
-
-          statusBox.textContent =
-            "✅ Flyer berhasil diupload.";
-
-          form.reset();
-
-        } else {
-
-          statusBox.textContent =
-            "❌ Upload gagal.";
-
-          alert(
-            result.error ||
-            result.message ||
-            "Upload gagal."
-          );
-        }
-
-      } catch (err) {
-
-        console.error(err);
-
-        statusBox.textContent =
-          "❌ Terjadi kesalahan.";
-
-        alert(
-          "Terjadi kesalahan:\n\n" +
-          err.message
-        );
-
-      } finally {
-
-        submitBtn.disabled = false;
-
-      }
-
-    });
-
-    function fileToBase64(file) {
-
-      return new Promise((resolve, reject) => {
-
-        const reader = new FileReader();
-
-        reader.onload = () => {
-          resolve(
-            reader.result.split(",")[1]
-          );
-        };
-
-        reader.onerror = reject;
-
-        reader.readAsDataURL(file);
-
-      });
-
-    }
-
-  </script>
+  <script src="upload.js"></script>
 
 </body>
 </html>
+```
