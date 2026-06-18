@@ -141,7 +141,7 @@ h1{
 <script>
 
 const API_URL =
-"https://script.google.com/macros/s/AKfycbzYtSigwZ0QJ21QR5_xf3IiEby6rIRgXyQlffzKuNZuzDmxXnQOs1zEYpYi7MYTBz6hTg/exec?action=getFlyers";
+"https://script.google.com/macros/s/AKfycbw8R8VkhJvlG1gaFonBSxeD1JBH0rRvA0g1iDo8NJN5D31KXpfK2rK3QkB7crRXTUBGFg/exec?action=getFlyers";
 
 const DAFTAR_URL =
 "https://docs.google.com/forms/d/e/1FAIpQLSdNOC8FuXcupj0QU-Y-TP-w4IncAKSPsCiN8gt_sGXZaa6XaQ/viewform";
@@ -155,9 +155,27 @@ document.getElementById("modal");
 const modalImg =
 document.getElementById("modalImg");
 
-async function loadFlyers() {
+function fixImageUrl(url){
 
-  try {
+  if(!url) return "";
+
+  if(url.includes("/file/d/")){
+
+    const id =
+      url.split("/file/d/")[1]
+         .split("/")[0];
+
+    return "https://drive.google.com/uc?export=view&id=" + id;
+  }
+
+  return url;
+}
+
+async function loadFlyers(){
+
+  try{
+
+    console.log("LOAD:", API_URL);
 
     const response =
       await fetch(API_URL);
@@ -165,24 +183,30 @@ async function loadFlyers() {
     const flyers =
       await response.json();
 
-    if (!Array.isArray(flyers)) {
+    console.log("DATA:", flyers);
+
+    if(!Array.isArray(flyers)){
+
+      flyerGrid.innerHTML =
+        '<div class="empty">Data flyer tidak valid.</div>';
+
+      return;
+    }
+
+    if(flyers.length === 0){
 
       flyerGrid.innerHTML =
         '<div class="empty">Belum ada flyer.</div>';
 
-      console.error(flyers);
       return;
     }
 
-    if (flyers.length === 0) {
-
-      flyerGrid.innerHTML =
-        '<div class="empty">Belum ada flyer.</div>';
-
-      return;
-    }
+    flyerGrid.innerHTML = "";
 
     flyers.forEach(flyer => {
+
+      const imageUrl =
+        fixImageUrl(flyer.imageUrl);
 
       const card =
         document.createElement("div");
@@ -193,32 +217,32 @@ async function loadFlyers() {
       card.innerHTML = `
         <img
           class="flyer-image"
-          src="${flyer.imageUrl}"
+          src="${imageUrl}"
           alt="${flyer.judul}"
         >
 
         <div class="flyer-content">
 
-          <h3>${flyer.judul}</h3>
+          <h3>${flyer.judul || ""}</h3>
 
           <p>
             <strong>Pemateri:</strong>
-            ${flyer.nama}
+            ${flyer.nama || ""}
           </p>
 
           <p>
             <strong>Tanggal:</strong>
-            ${flyer.tanggal}
+            ${flyer.tanggal || ""}
           </p>
 
           <p>
             <strong>Tempat:</strong>
-            ${flyer.tempat}
+            ${flyer.tempat || ""}
           </p>
 
           <p>
             <strong>Waktu:</strong>
-            ${flyer.waktu}
+            ${flyer.waktu || ""}
           </p>
 
         </div>
@@ -235,27 +259,20 @@ async function loadFlyers() {
       const image =
         card.querySelector(".flyer-image");
 
-      image.addEventListener(
-        "click",
-        () => {
+      image.addEventListener("click", () => {
 
-          modalImg.src =
-            flyer.imageUrl;
+        modalImg.src = imageUrl;
+        modal.classList.add("show");
 
-          modal.classList.add(
-            "show"
-          );
-
-        }
-      );
+      });
 
       flyerGrid.appendChild(card);
 
     });
 
-  } catch(err) {
+  }catch(err){
 
-    console.error(err);
+    console.error("LOAD ERROR:", err);
 
     flyerGrid.innerHTML =
       '<div class="empty">Gagal memuat data flyer.</div>';
@@ -266,7 +283,9 @@ async function loadFlyers() {
 
 modal.addEventListener(
   "click",
-  () => modal.classList.remove("show")
+  () => {
+    modal.classList.remove("show");
+  }
 );
 
 loadFlyers();
