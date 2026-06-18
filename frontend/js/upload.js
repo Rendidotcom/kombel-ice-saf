@@ -1,101 +1,136 @@
 "use strict";
 
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbzfDx5V6PgXMxZJhvMxOMp6JVjo4BNFHaBZM3AKcoNisyWOh9QWoADZxzZxsyp1EBWQHQ/exec";
+"https://script.google.com/macros/s/AKfycbw__0YPSNi-fT08-lbrb799jYh7v8FoRWriScq0kAYPL0o_u0FTXTRUCFAUyWLjofIu5g/exec";
 
 const uploadForm = document.getElementById("uploadForm");
 
 uploadForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
 
-  try {
-    const nama = document.getElementById("nama").value.trim();
-    const judul = document.getElementById("judul").value.trim();
-    const tanggal = document.getElementById("tanggal").value;
-    const tempat = document.getElementById("tempat").value.trim();
-    const waktu = document.getElementById("waktu").value.trim();
+event.preventDefault();
 
-    const fileInput = document.getElementById("flyer");
-    const file = fileInput.files[0];
+try {
 
-    if (!nama || !judul || !tanggal || !tempat || !waktu) {
-      alert("Lengkapi seluruh data terlebih dahulu.");
-      return;
-    }
+```
+const nama =
+  document.getElementById("nama").value.trim();
 
-    if (!file) {
-      alert("Pilih file flyer terlebih dahulu.");
-      return;
-    }
+const judul =
+  document.getElementById("judul_materi").value.trim();
 
-    const base64 = await toBase64(file);
+const tanggal =
+  document.getElementById("tanggal").value;
 
-    const payload = {
-      nama,
-      judul,
-      tanggal,
-      tempat,
-      waktu,
-      fileName: file.name,
-      mimeType: file.type,
-      image: base64
-    };
+const tempat =
+  document.getElementById("tempat").value.trim();
 
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
+const waktu =
+  document.getElementById("waktu").value.trim();
 
-    const result = await response.json();
+const file =
+  document.getElementById("foto").files[0];
 
-    if (result.success) {
-      alert("Flyer berhasil diupload.");
+if (!nama || !judul || !tanggal || !tempat || !waktu) {
+  alert("Lengkapi seluruh data terlebih dahulu.");
+  return;
+}
 
-      uploadForm.reset();
+if (!file) {
+  alert("Pilih file flyer terlebih dahulu.");
+  return;
+}
 
-      console.log("Upload Success:", result);
+const submitButton =
+  document.querySelector("button[type='submit']");
 
-      /*
-      result.id
-      result.fileId
-      result.imageUrl
-      */
-    } else {
-      alert(
-        "Upload gagal: " +
-        (result.error || result.message || "Unknown error")
-      );
+submitButton.disabled = true;
+submitButton.textContent = "Mengupload...";
 
-      console.error(result);
-    }
+const base64 = await toBase64(file);
 
-  } catch (error) {
+const payload = new URLSearchParams();
 
-    console.error(error);
+payload.append("nama", nama);
+payload.append("judul", judul);
+payload.append("tanggal", tanggal);
+payload.append("tempat", tempat);
+payload.append("waktu", waktu);
 
-    alert(
-      "Terjadi kesalahan saat upload:\n" +
-      error.message
-    );
-  }
+payload.append("photoBase64", base64);
+payload.append("photoName", file.name);
+
+const response = await fetch(API_URL, {
+  method: "POST",
+  body: payload
+});
+
+const result = await response.json();
+
+if (result.success || result.ok) {
+
+  alert("✅ Flyer berhasil diupload.");
+
+  uploadForm.reset();
+
+  console.log(result);
+
+} else {
+
+  alert(
+    "❌ Upload gagal:\n\n" +
+    (result.error ||
+     result.message ||
+     "Unknown error")
+  );
+
+  console.error(result);
+
+}
+```
+
+} catch (error) {
+
+```
+console.error(error);
+
+alert(
+  "❌ Terjadi kesalahan:\n\n" +
+  error.message
+);
+```
+
+} finally {
+
+```
+const submitButton =
+  document.querySelector("button[type='submit']");
+
+submitButton.disabled = false;
+submitButton.textContent = "Kirim";
+```
+
+}
+
 });
 
 function toBase64(file) {
-  return new Promise((resolve, reject) => {
 
-    const reader = new FileReader();
+return new Promise((resolve, reject) => {
 
-    reader.onload = () => {
-      const base64 = reader.result.split(",")[1];
-      resolve(base64);
-    };
+```
+const reader = new FileReader();
 
-    reader.onerror = reject;
+reader.onload = () => {
+  resolve(
+    reader.result.split(",")[1]
+  );
+};
 
-    reader.readAsDataURL(file);
+reader.onerror = reject;
 
-  });
+reader.readAsDataURL(file);
+```
+
+});
+
 }
