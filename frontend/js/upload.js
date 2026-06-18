@@ -3,7 +3,7 @@
 alert("UPLOAD JS LOADED");
 
 const API_URL =
-"https://script.google.com/macros/s/AKfycbyh4Jcs0jjFXo_c348m7Ycz1Qt5IkmWwwRDeSONtcFg4Vr7kAJvrKksB2rzj2UwjjAoiA/exec";
+"https://script.google.com/macros/s/AKfycbxYAPyK6DpYkFNETP42hw5g-4-eLzaCCgS2xP1Z8kTVT9WFYGd_9hQ7-mzUaB_kywo9ew/exec";
 
 window.addEventListener("DOMContentLoaded", () => {
 
