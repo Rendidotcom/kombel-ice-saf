@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -7,6 +6,7 @@
 <title>Flyer Kegiatan ICE SAF</title>
 
 <style>
+
 *{
   box-sizing:border-box;
 }
@@ -30,7 +30,7 @@ nav a{
   text-decoration:none;
   background:#007bff;
   color:#fff;
-  padding:8px 14px;
+  padding:10px 15px;
   border-radius:6px;
   font-size:14px;
 }
@@ -41,12 +41,12 @@ nav a:hover{
 
 h1{
   text-align:center;
-  margin-bottom:25px;
+  margin-bottom:30px;
 }
 
 .flyer-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
   gap:20px;
 }
 
@@ -55,13 +55,19 @@ h1{
   border-radius:12px;
   overflow:hidden;
   box-shadow:0 2px 10px rgba(0,0,0,.15);
+  transition:.2s;
+}
+
+.flyer-card:hover{
+  transform:translateY(-3px);
 }
 
 .flyer-image{
   width:100%;
-  height:380px;
+  height:420px;
   object-fit:cover;
   cursor:pointer;
+  display:block;
 }
 
 .flyer-content{
@@ -70,6 +76,7 @@ h1{
 
 .flyer-content h3{
   margin-top:0;
+  margin-bottom:10px;
 }
 
 .flyer-content p{
@@ -81,7 +88,7 @@ h1{
   text-align:center;
   padding:12px;
   background:#007bff;
-  color:#fff;
+  color:white;
   text-decoration:none;
   font-weight:bold;
 }
@@ -92,22 +99,23 @@ h1{
 
 .empty{
   text-align:center;
-  font-size:18px;
   color:#666;
-  margin-top:50px;
+  font-size:18px;
+  margin-top:40px;
 }
 
 .modal{
   display:none;
   position:fixed;
-  left:0;
   top:0;
+  left:0;
   width:100%;
   height:100%;
-  background:rgba(0,0,0,.85);
+  background:rgba(0,0,0,.9);
   justify-content:center;
   align-items:center;
   z-index:9999;
+  padding:20px;
 }
 
 .modal.show{
@@ -115,11 +123,18 @@ h1{
 }
 
 .modal img{
-  max-width:90%;
-  max-height:90%;
+  max-width:95%;
+  max-height:95%;
+  border-radius:10px;
 }
-</style>
 
+.loading{
+  text-align:center;
+  font-size:18px;
+  color:#555;
+}
+
+</style>
 </head>
 
 <body>
@@ -132,7 +147,9 @@ h1{
 
 <h1>Flyer Kegiatan ICE SAF</h1>
 
-<div id="flyerGrid" class="flyer-grid"></div>
+<div id="flyerGrid" class="flyer-grid">
+  <div class="loading">Memuat data flyer...</div>
+</div>
 
 <div id="modal" class="modal">
   <img id="modalImg" src="">
@@ -155,27 +172,9 @@ document.getElementById("modal");
 const modalImg =
 document.getElementById("modalImg");
 
-function fixImageUrl(url){
-
-  if(!url) return "";
-
-  if(url.includes("/file/d/")){
-
-    const id =
-      url.split("/file/d/")[1]
-         .split("/")[0];
-
-    return "https://drive.google.com/uc?export=view&id=" + id;
-  }
-
-  return url;
-}
-
 async function loadFlyers(){
 
   try{
-
-    console.log("LOAD:", API_URL);
 
     const response =
       await fetch(API_URL);
@@ -183,13 +182,14 @@ async function loadFlyers(){
     const flyers =
       await response.json();
 
-    console.log("DATA:", flyers);
+    console.log("FLYERS:", flyers);
 
     if(!Array.isArray(flyers)){
 
       flyerGrid.innerHTML =
-        '<div class="empty">Data flyer tidak valid.</div>';
+        '<div class="empty">Format data API tidak valid.</div>';
 
+      console.error(flyers);
       return;
     }
 
@@ -205,8 +205,8 @@ async function loadFlyers(){
 
     flyers.forEach(flyer => {
 
-      const imageUrl =
-        fixImageUrl(flyer.imageUrl);
+      const imageSrc =
+        `https://drive.google.com/thumbnail?id=${flyer.fileId}&sz=w1200`;
 
       const card =
         document.createElement("div");
@@ -217,32 +217,33 @@ async function loadFlyers(){
       card.innerHTML = `
         <img
           class="flyer-image"
-          src="${imageUrl}"
+          src="${imageSrc}"
           alt="${flyer.judul}"
+          loading="lazy"
         >
 
         <div class="flyer-content">
 
-          <h3>${flyer.judul || ""}</h3>
+          <h3>${flyer.judul}</h3>
 
           <p>
             <strong>Pemateri:</strong>
-            ${flyer.nama || ""}
+            ${flyer.nama}
           </p>
 
           <p>
             <strong>Tanggal:</strong>
-            ${flyer.tanggal || ""}
+            ${flyer.tanggal}
           </p>
 
           <p>
             <strong>Tempat:</strong>
-            ${flyer.tempat || ""}
+            ${flyer.tempat}
           </p>
 
           <p>
             <strong>Waktu:</strong>
-            ${flyer.waktu || ""}
+            ${flyer.waktu}
           </p>
 
         </div>
@@ -259,12 +260,17 @@ async function loadFlyers(){
       const image =
         card.querySelector(".flyer-image");
 
-      image.addEventListener("click", () => {
+      image.addEventListener(
+        "click",
+        () => {
 
-        modalImg.src = imageUrl;
-        modal.classList.add("show");
+          modalImg.src =
+            `https://drive.google.com/thumbnail?id=${flyer.fileId}&sz=w2500`;
 
-      });
+          modal.classList.add("show");
+
+        }
+      );
 
       flyerGrid.appendChild(card);
 
@@ -272,7 +278,7 @@ async function loadFlyers(){
 
   }catch(err){
 
-    console.error("LOAD ERROR:", err);
+    console.error(err);
 
     flyerGrid.innerHTML =
       '<div class="empty">Gagal memuat data flyer.</div>';
