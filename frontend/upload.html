@@ -11,10 +11,10 @@
     }
 
     body {
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 20px;
       background: #f4f4f4;
-      font-family: Arial, sans-serif;
     }
 
     nav {
@@ -24,12 +24,12 @@
 
     nav a {
       display: inline-block;
-      padding: 10px 16px;
-      margin: 0 5px;
       text-decoration: none;
-      color: #fff;
       background: #007bff;
+      color: white;
+      padding: 8px 14px;
       border-radius: 6px;
+      margin: 0 5px;
       font-weight: bold;
     }
 
@@ -38,17 +38,17 @@
     }
 
     .container {
-      max-width: 700px;
+      max-width: 600px;
       margin: 0 auto;
     }
 
     h1 {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     form {
-      background: #fff;
+      background: white;
       padding: 24px;
       border-radius: 8px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -56,7 +56,7 @@
 
     label {
       display: block;
-      margin-top: 14px;
+      margin-top: 12px;
       margin-bottom: 6px;
       font-weight: bold;
     }
@@ -66,10 +66,6 @@
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 5px;
-    }
-
-    input[type="file"] {
-      padding: 8px;
     }
 
     button {
@@ -117,32 +113,16 @@
     <form id="uploadForm">
 
       <label for="nama">Nama Pemateri</label>
-      <input
-        type="text"
-        id="nama"
-        required
-      >
+      <input type="text" id="nama" required>
 
       <label for="judul_materi">Judul Materi</label>
-      <input
-        type="text"
-        id="judul_materi"
-        required
-      >
+      <input type="text" id="judul_materi" required>
 
       <label for="tanggal">Tanggal Pelaksanaan</label>
-      <input
-        type="date"
-        id="tanggal"
-        required
-      >
+      <input type="date" id="tanggal" required>
 
       <label for="tempat">Tempat Pelaksanaan</label>
-      <input
-        type="text"
-        id="tempat"
-        required
-      >
+      <input type="text" id="tempat" required>
 
       <label for="waktu">Waktu Pelaksanaan</label>
       <input
@@ -160,10 +140,7 @@
         required
       >
 
-      <button
-        type="submit"
-        id="submitBtn"
-      >
+      <button type="submit" id="submitBtn">
         Kirim Flyer
       </button>
 
@@ -173,7 +150,147 @@
 
   </div>
 
-  <script src="upload.js"></script>
+  <script>
+
+    const WEBAPP_URL =
+    "https://script.google.com/macros/s/AKfycbyh4Jcs0jjFXo_c348m7Ycz1Qt5IkmWwwRDeSONtcFg4Vr7kAJvrKksB2rzj2UwjjAoiA/exec";
+
+    const form =
+      document.getElementById("uploadForm");
+
+    const statusBox =
+      document.getElementById("status");
+
+    const submitBtn =
+      document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async (e) => {
+
+      e.preventDefault();
+
+      alert("SUBMIT");
+
+      const nama =
+        document.getElementById("nama").value.trim();
+
+      const judul =
+        document.getElementById("judul_materi").value.trim();
+
+      const tanggal =
+        document.getElementById("tanggal").value;
+
+      const tempat =
+        document.getElementById("tempat").value.trim();
+
+      const waktu =
+        document.getElementById("waktu").value.trim();
+
+      const file =
+        document.getElementById("foto").files[0];
+
+      if (!file) {
+        alert("Pilih flyer terlebih dahulu.");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      statusBox.textContent = "⏳ Mengupload flyer...";
+
+      try {
+
+        const base64 =
+          await fileToBase64(file);
+
+        const payload =
+          new URLSearchParams();
+
+        payload.append("nama", nama);
+        payload.append("judul", judul);
+        payload.append("tanggal", tanggal);
+        payload.append("tempat", tempat);
+        payload.append("waktu", waktu);
+
+        payload.append("photoBase64", base64);
+        payload.append("photoName", file.name);
+
+        alert("FETCH START");
+
+        const response =
+          await fetch(WEBAPP_URL, {
+            method: "POST",
+            body: payload
+          });
+
+        alert("FETCH DONE");
+
+        const text =
+          await response.text();
+
+        alert(text);
+
+        const result =
+          JSON.parse(text);
+
+        if (result.success) {
+
+          statusBox.textContent =
+            "✅ Flyer berhasil diupload.";
+
+          alert("UPLOAD BERHASIL");
+
+          form.reset();
+
+        } else {
+
+          statusBox.textContent =
+            "❌ Upload gagal.";
+
+          alert(
+            "ERROR:\n\n" +
+            (result.error || result.message)
+          );
+        }
+
+      } catch (err) {
+
+        alert(
+          "FETCH ERROR:\n\n" +
+          err.message
+        );
+
+        statusBox.textContent =
+          "❌ Terjadi kesalahan.";
+
+      } finally {
+
+        submitBtn.disabled = false;
+
+      }
+
+    });
+
+    function fileToBase64(file) {
+
+      return new Promise((resolve, reject) => {
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          resolve(
+            reader.result.split(",")[1]
+          );
+        };
+
+        reader.onerror = reject;
+
+        reader.readAsDataURL(file);
+
+      });
+
+    }
+
+  </script>
 
 </body>
 </html>
+```
