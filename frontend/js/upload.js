@@ -1,7 +1,7 @@
 "use strict";
 
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbw__0YPSNi-fT08-lbrb799jYh7v8FoRWriScq0kAYPL0o_u0FTXTRUCFAUyWLjofIu5g/exec";
+  "https://script.google.com/macros/s/AKfycbzfDx5V6PgXMxZJhvMxOMp6JVjo4BNFHaBZM3AKcoNisyWOh9QWoADZxzZxsyp1EBWQHQ/exec";
 
 const uploadForm = document.getElementById("uploadForm");
 
