@@ -1,296 +1,113 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Upload Flyer - Kombel ICE SAF</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Flyer - Kombel ICE SAF</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
 
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: #f4f4f4;
-    }
+*{
+box-sizing:border-box;
+}
 
-    nav {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+body{
+font-family:Arial,sans-serif;
+background:#f4f4f4;
+margin:0;
+padding:20px;
+}
 
-    nav a {
-      display: inline-block;
-      text-decoration: none;
-      background: #007bff;
-      color: white;
-      padding: 8px 14px;
-      border-radius: 6px;
-      margin: 0 5px;
-      font-weight: bold;
-    }
+.container{
+max-width:700px;
+margin:auto;
+}
 
-    nav a:hover {
-      background: #0056b3;
-    }
+h1{
+text-align:center;
+}
 
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-    }
+form{
+background:#fff;
+padding:25px;
+border-radius:10px;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
 
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+label{
+display:block;
+margin-top:12px;
+font-weight:bold;
+}
 
-    form {
-      background: white;
-      padding: 24px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
+input{
+width:100%;
+padding:10px;
+margin-top:5px;
+}
 
-    label {
-      display: block;
-      margin-top: 12px;
-      margin-bottom: 6px;
-      font-weight: bold;
-    }
+button{
+width:100%;
+padding:12px;
+margin-top:20px;
+background:#28a745;
+color:white;
+border:none;
+border-radius:5px;
+font-size:16px;
+cursor:pointer;
+}
 
-    input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
+button:disabled{
+background:#999;
+}
 
-    button {
-      width: 100%;
-      margin-top: 20px;
-      padding: 12px;
-      border: none;
-      border-radius: 5px;
-      background: #28a745;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+#status{
+margin-top:15px;
+text-align:center;
+font-weight:bold;
+}
 
-    button:hover {
-      background: #218838;
-    }
+</style>
 
-    button:disabled {
-      background: #999;
-      cursor: not-allowed;
-    }
-
-    #status {
-      margin-top: 15px;
-      text-align: center;
-      font-weight: bold;
-    }
-  </style>
 </head>
-
 <body>
 
-  <nav>
-    <a href="index.html">🔽 Unduh Sertifikat</a>
-    <a href="upload.html">🖼️ Upload Flyer</a>
-    <a href="flyers.html">📄 Lihat Flyer</a>
-  </nav>
+<div class="container">
 
-  <div class="container">
+<h1>Upload Flyer Baru</h1>
 
-    <h1>Upload Flyer Baru</h1>
+<form id="uploadForm">
 
-    <form id="uploadForm">
+<label>Nama Pemateri</label>
+<input type="text" id="nama" required>
 
-      <label for="nama">Nama Pemateri</label>
-      <input type="text" id="nama" required>
+<label>Judul Materi</label>
+<input type="text" id="judul_materi" required>
 
-      <label for="judul_materi">Judul Materi</label>
-      <input type="text" id="judul_materi" required>
+<label>Tanggal Pelaksanaan</label>
+<input type="date" id="tanggal" required>
 
-      <label for="tanggal">Tanggal Pelaksanaan</label>
-      <input type="date" id="tanggal" required>
+<label>Tempat Pelaksanaan</label>
+<input type="text" id="tempat" required>
 
-      <label for="tempat">Tempat Pelaksanaan</label>
-      <input type="text" id="tempat" required>
+<label>Waktu Pelaksanaan</label>
+<input type="text" id="waktu" required>
 
-      <label for="waktu">Waktu Pelaksanaan</label>
-      <input
-        type="text"
-        id="waktu"
-        placeholder="Contoh: 08:00 - 10:00"
-        required
-      >
+<label>Upload Flyer</label>
+<input type="file" id="foto" accept="image/*" required>
 
-      <label for="foto">Upload Flyer</label>
-      <input
-        type="file"
-        id="foto"
-        accept="image/*"
-        required
-      >
+<button type="submit">
+Kirim Flyer
+</button>
 
-      <button type="submit" id="submitBtn">
-        Kirim Flyer
-      </button>
+</form>
 
-    </form>
+<div id="status"></div>
 
-    <div id="status"></div>
+</div>
 
-  </div>
-
-  <script>
-
-    const WEBAPP_URL =
-    "https://script.google.com/macros/s/AKfycbyh4Jcs0jjFXo_c348m7Ycz1Qt5IkmWwwRDeSONtcFg4Vr7kAJvrKksB2rzj2UwjjAoiA/exec";
-
-    const form =
-      document.getElementById("uploadForm");
-
-    const statusBox =
-      document.getElementById("status");
-
-    const submitBtn =
-      document.getElementById("submitBtn");
-
-    form.addEventListener("submit", async (e) => {
-
-      e.preventDefault();
-
-      alert("SUBMIT");
-
-      const nama =
-        document.getElementById("nama").value.trim();
-
-      const judul =
-        document.getElementById("judul_materi").value.trim();
-
-      const tanggal =
-        document.getElementById("tanggal").value;
-
-      const tempat =
-        document.getElementById("tempat").value.trim();
-
-      const waktu =
-        document.getElementById("waktu").value.trim();
-
-      const file =
-        document.getElementById("foto").files[0];
-
-      if (!file) {
-        alert("Pilih flyer terlebih dahulu.");
-        return;
-      }
-
-      submitBtn.disabled = true;
-      statusBox.textContent = "⏳ Mengupload flyer...";
-
-      try {
-
-        const base64 =
-          await fileToBase64(file);
-
-        const payload =
-          new URLSearchParams();
-
-        payload.append("nama", nama);
-        payload.append("judul", judul);
-        payload.append("tanggal", tanggal);
-        payload.append("tempat", tempat);
-        payload.append("waktu", waktu);
-
-        payload.append("photoBase64", base64);
-        payload.append("photoName", file.name);
-
-        alert("FETCH START");
-
-        const response =
-          await fetch(WEBAPP_URL, {
-            method: "POST",
-            body: payload
-          });
-
-        alert("FETCH DONE");
-
-        const text =
-          await response.text();
-
-        alert(text);
-
-        const result =
-          JSON.parse(text);
-
-        if (result.success) {
-
-          statusBox.textContent =
-            "✅ Flyer berhasil diupload.";
-
-          alert("UPLOAD BERHASIL");
-
-          form.reset();
-
-        } else {
-
-          statusBox.textContent =
-            "❌ Upload gagal.";
-
-          alert(
-            "ERROR:\n\n" +
-            (result.error || result.message)
-          );
-        }
-
-      } catch (err) {
-
-        alert(
-          "FETCH ERROR:\n\n" +
-          err.message
-        );
-
-        statusBox.textContent =
-          "❌ Terjadi kesalahan.";
-
-      } finally {
-
-        submitBtn.disabled = false;
-
-      }
-
-    });
-
-    function fileToBase64(file) {
-
-      return new Promise((resolve, reject) => {
-
-        const reader = new FileReader();
-
-        reader.onload = () => {
-          resolve(
-            reader.result.split(",")[1]
-          );
-        };
-
-        reader.onerror = reject;
-
-        reader.readAsDataURL(file);
-
-      });
-
-    }
-
-  </script>
+<script src="upload.js"></script>
 
 </body>
 </html>
-```
