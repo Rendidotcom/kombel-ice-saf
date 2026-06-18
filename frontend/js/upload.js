@@ -1,32 +1,101 @@
 "use strict";
 
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbw__0YPSNi-fT08-lbrb799jYh7v8FoRWriScq0kAYPL0o_u0FTXTRUCFAUyWLjofIu5g/exec";
+
 const uploadForm = document.getElementById("uploadForm");
 
 uploadForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  const formData = new FormData(uploadForm);
-
   try {
-    const response = await fetch("/upload", {
+    const nama = document.getElementById("nama").value.trim();
+    const judul = document.getElementById("judul").value.trim();
+    const tanggal = document.getElementById("tanggal").value;
+    const tempat = document.getElementById("tempat").value.trim();
+    const waktu = document.getElementById("waktu").value.trim();
+
+    const fileInput = document.getElementById("flyer");
+    const file = fileInput.files[0];
+
+    if (!nama || !judul || !tanggal || !tempat || !waktu) {
+      alert("Lengkapi seluruh data terlebih dahulu.");
+      return;
+    }
+
+    if (!file) {
+      alert("Pilih file flyer terlebih dahulu.");
+      return;
+    }
+
+    const base64 = await toBase64(file);
+
+    const payload = {
+      nama,
+      judul,
+      tanggal,
+      tempat,
+      waktu,
+      fileName: file.name,
+      mimeType: file.type,
+      image: base64
+    };
+
+    const response = await fetch(API_URL, {
       method: "POST",
-      body: formData,
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
     });
 
     const result = await response.json();
 
-    if (response.ok) {
-      alert("Flyer berhasil diupload!");
-      uploadForm.reset();
-      console.log("Hasil:", result);
+    if (result.success) {
+      alert("Flyer berhasil diupload.");
 
-      // Optional: Redirect ke index.html setelah upload
-      // window.location.href = "/index.html";
+      uploadForm.reset();
+
+      console.log("Upload Success:", result);
+
+      /*
+      result.id
+      result.fileId
+      result.imageUrl
+      */
     } else {
-      alert("Gagal upload: " + (result.error || result.message || "Terjadi kesalahan."));
+      alert(
+        "Upload gagal: " +
+        (result.error || result.message || "Unknown error")
+      );
+
+      console.error(result);
     }
+
   } catch (error) {
-    console.error("Terjadi kesalahan:", error);
-    alert("Gagal upload flyer.");
+
+    console.error(error);
+
+    alert(
+      "Terjadi kesalahan saat upload:\n" +
+      error.message
+    );
   }
 });
+
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const base64 = reader.result.split(",")[1];
+      resolve(base64);
+    };
+
+    reader.onerror = reject;
+
+    reader.readAsDataURL(file);
+
+  });
+}
