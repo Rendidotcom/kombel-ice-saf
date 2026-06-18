@@ -17,6 +17,25 @@ body{
   padding:20px;
 }
 
+/* NAV FIX (PENTING) */
+nav{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+}
+
+nav a{
+  text-decoration:none;
+  background:#333;
+  color:#fff;
+  padding:8px 12px;
+  border-radius:6px;
+  font-size:14px;
+}
+
+/* CONTAINER */
 .container{
   max-width:700px;
   margin:auto;
@@ -76,7 +95,7 @@ button:disabled{
   font-weight:bold;
 }
 
-/* RESULT SCREEN (baru) */
+/* RESULT */
 #resultBox{
   display:none;
   background:#fff;
@@ -98,30 +117,21 @@ button:disabled{
   cursor:pointer;
 }
 
-#backBtn{
-  background:#007bff;
-  color:white;
-}
-
-#viewBtn{
-  background:#17a2b8;
-  color:white;
-}
-
-#downloadBtn{
-  background:#ffc107;
-  color:black;
-}
+#backBtn{ background:#007bff; color:white; }
+#viewBtn{ background:#17a2b8; color:white; }
+#downloadBtn{ background:#ffc107; color:black; }
 </style>
 
 </head>
 
 <body>
+
 <nav>
-    <a href="index.html">🔽 Unduh Sertifikat</a>
-    <a href="upload.html">🖼️ Unggah Flyer</a>
-    <a href="flyers.html">📄 Lihat Flyer</a>
-  </nav>
+  <a href="index.html">🔽 Unduh Sertifikat</a>
+  <a href="upload.html">🖼️ Unggah Flyer</a>
+  <a href="flyers.html">📄 Lihat Flyer</a>
+</nav>
+
 <div class="container">
 
 <h1>Upload Flyer Baru</h1>
@@ -154,26 +164,26 @@ Kirim Flyer
 
 <div id="status"></div>
 
-<!-- RESULT SECTION (baru) -->
 <div id="resultBox">
   <h3>Upload Berhasil</h3>
 
-  <button class="result-btn" id="backBtn">
+  <button class="result-btn" id="backBtn" type="button">
     Kembali ke Halaman Flyer
   </button>
 
-  <button class="result-btn" id="viewBtn">
+  <button class="result-btn" id="viewBtn" type="button">
     Lihat Flyer
   </button>
 
-  <button class="result-btn" id="downloadBtn">
+  <button class="result-btn" id="downloadBtn" type="button">
     Unduh Sertifikat
   </button>
 </div>
 
 </div>
 
-<script src="/js/upload.js"></script>
+<!-- FIX PATH SCRIPT (KRITIS) -->
+<script src="js/upload.js"></script>
 
 </body>
 </html>
