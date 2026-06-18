@@ -2,83 +2,99 @@
 
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Upload Flyer - Kombel ICE SAF</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 20px;
-      background-color: #f4f4f4;
+      background: #f4f4f4;
     }
 
     nav {
-      margin-bottom: 20px;
       text-align: center;
+      margin-bottom: 20px;
     }
 
     nav a {
+      display: inline-block;
       text-decoration: none;
       background: #007bff;
       color: white;
       padding: 8px 14px;
       border-radius: 6px;
-      font-weight: bold;
-      font-size: 0.9rem;
       margin: 0 5px;
+      font-weight: bold;
     }
 
     nav a:hover {
       background: #0056b3;
     }
 
-    h1 {
-      text-align: center;
-    }
-
-    form {
-      background: #fff;
-      padding: 20px;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 500px;
+    .container {
+      max-width: 600px;
       margin: 0 auto;
     }
 
-    label {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 8px;
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
     }
 
-    input[type="text"],
-    input[type="date"],
-    input[type="file"],
-    button {
+    form {
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input {
       width: 100%;
       padding: 10px;
-      margin: 10px 0;
       border: 1px solid #ccc;
       border-radius: 5px;
-      box-sizing: border-box;
     }
 
     button {
-      background-color: #4CAF50;
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      background: #28a745;
       color: white;
-      cursor: pointer;
+      font-size: 16px;
       font-weight: bold;
+      cursor: pointer;
     }
 
     button:hover {
-      background-color: #45a049;
+      background: #218838;
     }
 
     button:disabled {
-      background-color: #999;
+      background: #999;
       cursor: not-allowed;
+    }
+
+    #status {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
     }
   </style>
 
@@ -88,154 +104,185 @@
 
   <nav>
     <a href="index.html">🔽 Unduh Sertifikat</a>
-    <a href="upload.html">🖼️ Unggah Flyer</a>
+    <a href="upload.html">🖼️ Upload Flyer</a>
     <a href="flyers.html">📄 Lihat Flyer</a>
   </nav>
 
-  <h1>Upload Flyer Baru</h1>
-
-  <form id="uploadForm">
+  <div class="container">
 
 ```
-<label>Nama Pemateri:</label>
-<input type="text" id="nama" required />
+<h1>Upload Flyer Baru</h1>
 
-<label>Judul Materi:</label>
-<input type="text" id="judul_materi" required />
+<form id="uploadForm">
 
-<label>Tanggal Pelaksanaan:</label>
-<input type="date" id="tanggal" required />
+  <label for="nama">Nama Pemateri</label>
+  <input
+    type="text"
+    id="nama"
+    required
+  >
 
-<label>Tempat Pelaksanaan:</label>
-<input type="text" id="tempat" required />
+  <label for="judul_materi">Judul Materi</label>
+  <input
+    type="text"
+    id="judul_materi"
+    required
+  >
 
-<label>Waktu Pelaksanaan:</label>
-<input
-  type="text"
-  id="waktu"
-  placeholder="Contoh: 08:00 - 10:00"
-  required
-/>
+  <label for="tanggal">Tanggal Pelaksanaan</label>
+  <input
+    type="date"
+    id="tanggal"
+    required
+  >
 
-<label>Upload Foto Flyer:</label>
-<input
-  type="file"
-  id="foto"
-  accept="image/*"
-  required
-/>
+  <label for="tempat">Tempat Pelaksanaan</label>
+  <input
+    type="text"
+    id="tempat"
+    required
+  >
 
-<button type="submit">
-  Kirim
-</button>
+  <label for="waktu">Waktu Pelaksanaan</label>
+  <input
+    type="text"
+    id="waktu"
+    placeholder="Contoh: 08:00 - 10:00"
+    required
+  >
+
+  <label for="foto">Upload Flyer</label>
+  <input
+    type="file"
+    id="foto"
+    accept="image/*"
+    required
+  >
+
+  <button
+    type="submit"
+    id="submitBtn"
+  >
+    Kirim Flyer
+  </button>
+
+</form>
+
+<div id="status"></div>
 ```
 
-  </form>
+  </div>
 
   <script>
 
     const WEBAPP_URL =
       "https://script.google.com/macros/s/AKfycbw__0YPSNi-fT08-lbrb799jYh7v8FoRWriScq0kAYPL0o_u0FTXTRUCFAUyWLjofIu5g/exec";
 
-    document
-      .getElementById("uploadForm")
-      .addEventListener("submit", async function (e) {
+    const form =
+      document.getElementById("uploadForm");
 
-        e.preventDefault();
+    const statusBox =
+      document.getElementById("status");
 
-        const nama =
-          document.getElementById("nama").value.trim();
+    const submitBtn =
+      document.getElementById("submitBtn");
 
-        const judul =
-          document.getElementById("judul_materi").value.trim();
+    form.addEventListener("submit", async (e) => {
 
-        const tanggal =
-          document.getElementById("tanggal").value;
+      e.preventDefault();
 
-        const tempat =
-          document.getElementById("tempat").value.trim();
+      const nama =
+        document.getElementById("nama").value.trim();
 
-        const waktu =
-          document.getElementById("waktu").value.trim();
+      const judul =
+        document.getElementById("judul_materi").value.trim();
 
-        const file =
-          document.getElementById("foto").files[0];
+      const tanggal =
+        document.getElementById("tanggal").value;
 
-        if (!file) {
-          alert("Silakan pilih file flyer.");
-          return;
-        }
+      const tempat =
+        document.getElementById("tempat").value.trim();
 
-        const submitButton =
-          document.querySelector(
-            "button[type='submit']"
-          );
+      const waktu =
+        document.getElementById("waktu").value.trim();
 
-        submitButton.disabled = true;
-        submitButton.textContent = "Mengupload...";
+      const file =
+        document.getElementById("foto").files[0];
 
-        try {
+      if (!file) {
+        alert("Pilih flyer terlebih dahulu.");
+        return;
+      }
 
-          const base64 =
-            await fileToBase64(file);
+      submitBtn.disabled = true;
+      statusBox.textContent = "⏳ Mengupload flyer...";
 
-          const response = await fetch(
-            WEBAPP_URL,
-            {
-              method: "POST",
-              body: JSON.stringify({
-                nama: nama,
-                judul: judul,
-                tanggal: tanggal,
-                tempat: tempat,
-                waktu: waktu,
-                fileName: file.name,
-                mimeType: file.type,
-                image: base64
-              })
-            }
-          );
+      try {
 
-          const result =
-            await response.json();
+        const imageBase64 =
+          await fileToBase64(file);
 
-          if (!result.success) {
+        const payload = {
+          nama,
+          judul,
+          tanggal,
+          tempat,
+          waktu,
+          fileName: file.name,
+          mimeType: file.type,
+          image: imageBase64
+        };
 
-            alert(
-              "❌ Upload gagal\n\n" +
-              (result.error || "Unknown error")
-            );
+        const response =
+          await fetch(WEBAPP_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          });
 
-            console.error(result);
+        const result =
+          await response.json();
 
-            return;
-          }
+        if (result.success) {
 
-          alert(
-            "✅ Flyer berhasil disimpan ke Google Drive"
-          );
+          statusBox.textContent =
+            "✅ Flyer berhasil diupload.";
 
-          document
-            .getElementById("uploadForm")
-            .reset();
+          form.reset();
 
-        } catch (err) {
+        } else {
 
-          console.error(err);
+          statusBox.textContent =
+            "❌ Upload gagal.";
 
           alert(
-            "❌ Terjadi kesalahan\n\n" +
-            err.message
+            result.error ||
+            result.message ||
+            "Upload gagal."
           );
-
-        } finally {
-
-          submitButton.disabled = false;
-          submitButton.textContent = "Kirim";
-
         }
 
-      });
+      } catch (err) {
+
+        console.error(err);
+
+        statusBox.textContent =
+          "❌ Terjadi kesalahan.";
+
+        alert(
+          "Terjadi kesalahan:\n\n" +
+          err.message
+        );
+
+      } finally {
+
+        submitBtn.disabled = false;
+
+      }
+
+    });
 
     function fileToBase64(file) {
 
@@ -244,11 +291,9 @@
         const reader = new FileReader();
 
         reader.onload = () => {
-
           resolve(
             reader.result.split(",")[1]
           );
-
         };
 
         reader.onerror = reject;
