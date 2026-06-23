@@ -1,185 +1,225 @@
 "use strict";
 
-alert("UPLOAD JS LOADED");
-
 const API_URL =
 "https://script.google.com/macros/s/AKfycbw8R8VkhJvlG1gaFonBSxeD1JBH0rRvA0g1iDo8NJN5D31KXpfK2rK3QkB7crRXTUBGFg/exec";
 
-window.addEventListener("DOMContentLoaded", () => {
+const form =
+document.getElementById("uploadForm");
 
-  const uploadForm = document.getElementById("uploadForm");
+const status =
+document.getElementById("status");
 
-  uploadForm.addEventListener("submit", async (event) => {
+const submitBtn =
+document.getElementById("submitBtn");
 
-    event.preventDefault();
+const resultBox =
+document.getElementById("resultBox");
 
-    console.log("SUBMIT CLICKED");
+const backBtn =
+document.getElementById("backBtn");
 
-    try {
+const viewBtn =
+document.getElementById("viewBtn");
 
-      const nama =
-        document.getElementById("nama").value.trim();
+const downloadBtn =
+document.getElementById("downloadBtn");
 
-      const judul =
-        document.getElementById("judul_materi").value.trim();
+form.addEventListener(
+"submit",
+async function(e){
 
-      const tanggal =
-        document.getElementById("tanggal").value;
+e.preventDefault();
 
-      const tempat =
-        document.getElementById("tempat").value.trim();
+try{
 
-      const waktu =
-        document.getElementById("waktu").value.trim();
+submitBtn.disabled = true;
 
-      const file =
-        document.getElementById("foto").files[0];
+status.innerHTML =
+"⏳ Mengupload flyer...";
 
-      if (!nama || !judul || !tanggal || !tempat || !waktu) {
+const nama =
+document
+.getElementById("nama")
+.value
+.trim();
 
-        alert("Lengkapi seluruh data terlebih dahulu.");
-        return;
+const tanggal =
+document
+.getElementById("tanggal")
+.value;
 
-      }
+const foto =
+document
+.getElementById("foto")
+.files[0];
 
-      if (!file) {
+if(!nama){
 
-        alert("Pilih file flyer terlebih dahulu.");
-        return;
+status.innerHTML =
+"❌ Nama pemateri wajib diisi";
 
-      }
+submitBtn.disabled = false;
+return;
 
-      const submitButton =
-        document.getElementById("submitBtn");
+}
 
-      submitButton.disabled = true;
-      submitButton.textContent = "Mengupload...";
+if(!tanggal){
 
-      const base64 =
-        await toBase64(file);
+status.innerHTML =
+"❌ Tanggal wajib diisi";
 
-      alert(
-        "BASE64 LENGTH = " +
-        base64.length
-      );
+submitBtn.disabled = false;
+return;
 
-      const payload =
-        new URLSearchParams();
+}
 
-      payload.append("nama", nama);
-      payload.append("judul", judul);
-      payload.append("tanggal", tanggal);
-      payload.append("tempat", tempat);
-      payload.append("waktu", waktu);
-      payload.append("photoBase64", base64);
-      payload.append("photoName", file.name);
+if(!foto){
 
-      const response =
-        await fetch(API_URL, {
-          method: "POST",
-          body: payload
-        });
+status.innerHTML =
+"❌ Pilih flyer terlebih dahulu";
 
-      alert(
-        "HTTP STATUS = " +
-        response.status
-      );
+submitBtn.disabled = false;
+return;
 
-      const text =
-        await response.text();
+}
 
-      alert(
-        "RAW RESPONSE:\n\n" +
-        text
-      );
+const base64 =
+await fileToBase64(foto);
 
-      let result;
+const payload =
+new URLSearchParams();
 
-      try {
+payload.append(
+"action",
+"uploadFlyer"
+);
 
-        result =
-          JSON.parse(text);
+payload.append(
+"nama",
+nama
+);
 
-      } catch (e) {
+payload.append(
+"tanggal",
+tanggal
+);
 
-        throw new Error(
-          "Response bukan JSON:\n\n" +
-          text
-        );
+payload.append(
+"photoName",
+foto.name
+);
 
-      }
+payload.append(
+"photoBase64",
+base64
+);
 
-      if (
-        result.success ||
-        result.ok ||
-        result.status === "success"
-      ) {
+const response =
+await fetch(
+API_URL,
+{
+method:"POST",
+body:payload
+}
+);
 
-        alert(
-          "✅ Flyer berhasil diupload."
-        );
+const result =
+await response.json();
 
-        uploadForm.reset();
+if(result.success){
 
-      } else {
+status.innerHTML =
+"✅ Flyer berhasil diupload dan data diperbarui";
 
-        alert(
-          "❌ Upload gagal:\n\n" +
-          (
-            result.error ||
-            result.message ||
-            "Unknown error"
-          )
-        );
+resultBox.style.display =
+"block";
 
-      }
+form.reset();
 
-    } catch (error) {
+}else{
 
-      console.error(error);
+status.innerHTML =
+"❌ " +
+(result.error || "Upload gagal");
 
-      alert(
-        "❌ TERJADI ERROR:\n\n" +
-        error.message
-      );
+}
 
-    } finally {
+}catch(err){
 
-      const submitButton =
-        document.getElementById("submitBtn");
+console.error(err);
 
-      submitButton.disabled = false;
-      submitButton.textContent =
-        "Kirim Flyer";
+status.innerHTML =
+"❌ " + err.message;
 
-    }
+}
 
-  });
+submitBtn.disabled = false;
 
-});
+}
+);
 
-function toBase64(file) {
+function fileToBase64(file){
 
-  return new Promise(
-    (resolve, reject) => {
+return new Promise(
+(resolve,reject)=>{
 
-      const reader =
-        new FileReader();
+const reader =
+new FileReader();
 
-      reader.onload = () => {
+reader.onload =
+e=>{
 
-        resolve(
-          reader.result.split(",")[1]
-        );
+const result =
+e.target.result;
 
-      };
+resolve(
+result.split(",")[1]
+);
 
-      reader.onerror =
-        reject;
+};
 
-      reader.readAsDataURL(file);
+reader.onerror =
+reject;
 
-    }
-  );
+reader.readAsDataURL(file);
+
+}
+);
+
+}
+
+if(backBtn){
+
+backBtn.onclick =
+()=>{
+
+window.location.href =
+"flyers.html";
+
+};
+
+}
+
+if(viewBtn){
+
+viewBtn.onclick =
+()=>{
+
+window.location.href =
+"flyers.html";
+
+};
+
+}
+
+if(downloadBtn){
+
+downloadBtn.onclick =
+()=>{
+
+window.location.href =
+"index.html";
+
+};
 
 }
