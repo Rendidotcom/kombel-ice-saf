@@ -14,6 +14,9 @@ e.preventDefault();
 const status =
 document.getElementById("status");
 
+status.innerHTML =
+"⏳ Menyimpan data...";
+
 try{
 
 const nama =
@@ -30,24 +33,6 @@ document.getElementById("tempat").value.trim();
 
 const waktu =
 document.getElementById("waktu").value.trim();
-
-const imageUrl =
-document.getElementById("imageUrl").value.trim();
-
-const match =
-imageUrl.match(/\/d\/([^\/]+)/);
-
-if(!match){
-
-status.innerHTML =
-"Link Drive tidak valid";
-
-return;
-
-}
-
-const fileId =
-match[1];
 
 const payload =
 new URLSearchParams();
@@ -82,16 +67,6 @@ payload.append(
 waktu
 );
 
-payload.append(
-"fileId",
-fileId
-);
-
-payload.append(
-"imageUrl",
-imageUrl
-);
-
 const response =
 await fetch(
 API_URL,
@@ -107,7 +82,7 @@ await response.json();
 if(result.success){
 
 status.innerHTML =
-"✅ Data berhasil disimpan";
+"✅ Jadwal berhasil disimpan";
 
 document
 .getElementById(
@@ -119,7 +94,7 @@ document
 
 status.innerHTML =
 "❌ " +
-(result.error || "Gagal");
+(result.error || "Gagal menyimpan");
 
 }
 
