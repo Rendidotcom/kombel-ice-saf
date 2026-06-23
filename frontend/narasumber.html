@@ -1,108 +1,210 @@
-<script>
+<!DOCTYPE html>
 
-const API_URL =
-"https://script.google.com/macros/s/AKfycbxxxxxxxxxxxxxxxxxxxxxxxxxxxx/exec";
+<html lang="id">
 
-async function simpanJadwal() {
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  const nama =
-    document.getElementById("nama").value.trim();
+<title>Input Narasumber ICE SAF</title>
 
-  const judul =
-    document.getElementById("judul").value.trim();
+<style>
 
-  const tanggal =
-    document.getElementById("tanggal").value;
-
-  const tempat =
-    document.getElementById("tempat").value.trim();
-
-  const waktu =
-    document.getElementById("waktu").value.trim();
-
-  const imageUrl =
-    document.getElementById("imageUrl").value.trim();
-
-  const status =
-    document.getElementById("status");
-
-  status.innerHTML = "Menyimpan...";
-
-  const formData =
-    new FormData();
-
-  formData.append(
-    "action",
-    "saveNarasumber"
-  );
-
-  formData.append(
-    "nama",
-    nama
-  );
-
-  formData.append(
-    "judul",
-    judul
-  );
-
-  formData.append(
-    "tanggal",
-    tanggal
-  );
-
-  formData.append(
-    "tempat",
-    tempat
-  );
-
-  formData.append(
-    "waktu",
-    waktu
-  );
-
-  formData.append(
-    "imageUrl",
-    imageUrl
-  );
-
-  try {
-
-    const response =
-      await fetch(
-        API_URL,
-        {
-          method: "POST",
-          body: formData
-        }
-      );
-
-    const result =
-      await response.json();
-
-    if(result.success){
-
-      status.innerHTML =
-        "✅ Jadwal berhasil disimpan";
-
-      document
-        .getElementById("narasumberForm")
-        .reset();
-
-    } else {
-
-      status.innerHTML =
-        "❌ " + result.error;
-
-    }
-
-  } catch(err){
-
-    status.innerHTML =
-      "❌ Gagal koneksi";
-
-  }
-
+*{
+  box-sizing:border-box;
 }
 
-</script>
+body{
+  margin:0;
+  padding:20px;
+  background:#f4f4f4;
+  font-family:Arial,sans-serif;
+}
+
+nav{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:25px;
+}
+
+nav a{
+  text-decoration:none;
+  background:#007bff;
+  color:white;
+  padding:10px 15px;
+  border-radius:6px;
+  font-size:14px;
+  font-weight:bold;
+}
+
+nav a:hover{
+  background:#0056b3;
+}
+
+.container{
+  max-width:700px;
+  margin:auto;
+}
+
+.card{
+  background:white;
+  padding:25px;
+  border-radius:10px;
+  box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+h1{
+  text-align:center;
+  margin-bottom:25px;
+}
+
+label{
+  display:block;
+  margin-top:15px;
+  font-weight:bold;
+}
+
+input{
+  width:100%;
+  padding:10px;
+  margin-top:5px;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  margin-top:25px;
+  border:none;
+  border-radius:6px;
+  background:#28a745;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:.9;
+}
+
+#status{
+  margin-top:20px;
+  text-align:center;
+  font-weight:bold;
+}
+
+.info{
+  margin-bottom:20px;
+  padding:15px;
+  background:#eef7ff;
+  border-left:4px solid #007bff;
+  border-radius:5px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<nav>
+
+  <a href="index.html">
+    🔽 Unduh Sertifikat
+  </a>
+
+  <a href="upload.html">
+    🖼️ Unggah Flyer
+  </a>
+
+  <a href="flyers.html">
+    📄 Lihat Flyer
+  </a>
+
+  <a href="narasumber.html">
+    🎤 Input Narasumber
+  </a>
+
+</nav>
+
+<div class="container">
+
+<div class="card">
+
+<h1>Input Jadwal Narasumber</h1>
+
+<div class="info">
+Masukkan data narasumber dan link flyer Google Drive yang sudah diupload sebelumnya.
+</div>
+
+<form id="narasumberForm">
+
+<label>Nama Pemateri</label>
+<input
+type="text"
+id="nama"
+required
+
+>
+
+<label>Judul Materi</label>
+<input
+type="text"
+id="judul"
+required
+
+>
+
+<label>Tanggal Pelaksanaan</label>
+<input
+type="date"
+id="tanggal"
+required
+
+>
+
+<label>Tempat Pelaksanaan</label>
+<input
+type="text"
+id="tempat"
+required
+
+>
+
+<label>Waktu Pelaksanaan</label>
+<input
+type="text"
+id="waktu"
+placeholder="08.00 - 10.00 WIB"
+required
+
+>
+
+<label>Link Flyer Google Drive</label>
+<input
+type="text"
+id="imageUrl"
+placeholder="https://drive.google.com/file/d/xxxxxxxx/view"
+required
+
+>
+
+<button type="submit">
+
+🎤 Simpan Jadwal Narasumber
+
+</button>
+
+</form>
+
+<div id="status"></div>
+
+</div>
+
+</div>
+
+<script src="js/narasumber.js"></script>
+
+</body>
+</html>
