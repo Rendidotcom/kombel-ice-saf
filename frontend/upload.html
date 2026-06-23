@@ -1,11 +1,13 @@
 <!DOCTYPE html>
+
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Upload Flyer - Kombel ICE SAF</title>
+<title>Upload Flyer - ICE SAF</title>
 
 <style>
+
 *{
   box-sizing:border-box;
 }
@@ -17,7 +19,10 @@ body{
   padding:20px;
 }
 
-/* NAV FIX (PENTING) */
+/* =========================
+   NAVBAR
+========================= */
+
 nav{
   display:flex;
   gap:10px;
@@ -28,14 +33,22 @@ nav{
 
 nav a{
   text-decoration:none;
-  background:#333;
-  color:#fff;
-  padding:8px 12px;
+  background:#007bff;
+  color:white;
+  padding:10px 15px;
   border-radius:6px;
   font-size:14px;
+  font-weight:bold;
 }
 
-/* CONTAINER */
+nav a:hover{
+  background:#0056b3;
+}
+
+/* =========================
+   CONTAINER
+========================= */
+
 .container{
   max-width:700px;
   margin:auto;
@@ -43,13 +56,17 @@ nav a{
 
 h1{
   text-align:center;
+  margin-bottom:25px;
 }
 
-/* FORM */
+/* =========================
+   FORM
+========================= */
+
 form{
-  background:#fff;
+  background:white;
   padding:25px;
-  border-radius:10px;
+  border-radius:12px;
   box-shadow:0 2px 10px rgba(0,0,0,.1);
 }
 
@@ -63,9 +80,14 @@ input{
   width:100%;
   padding:10px;
   margin-top:5px;
+  border:1px solid #ccc;
+  border-radius:6px;
 }
 
-/* BUTTON */
+/* =========================
+   BUTTON
+========================= */
+
 button{
   width:100%;
   padding:12px;
@@ -73,14 +95,13 @@ button{
   background:#28a745;
   color:white;
   border:none;
-  border-radius:5px;
+  border-radius:6px;
   font-size:16px;
   cursor:pointer;
-  transition:0.2s;
 }
 
 button:hover{
-  opacity:0.9;
+  opacity:.9;
 }
 
 button:disabled{
@@ -88,20 +109,26 @@ button:disabled{
   cursor:not-allowed;
 }
 
-/* STATUS */
+/* =========================
+   STATUS
+========================= */
+
 #status{
   margin-top:15px;
   text-align:center;
   font-weight:bold;
 }
 
-/* RESULT */
+/* =========================
+   RESULT
+========================= */
+
 #resultBox{
   display:none;
-  background:#fff;
+  background:white;
   padding:20px;
   margin-top:20px;
-  border-radius:10px;
+  border-radius:12px;
   box-shadow:0 2px 10px rgba(0,0,0,.1);
   text-align:center;
 }
@@ -112,14 +139,26 @@ button:disabled{
   padding:12px;
   margin-top:10px;
   border:none;
-  border-radius:5px;
+  border-radius:6px;
   font-size:15px;
   cursor:pointer;
 }
 
-#backBtn{ background:#007bff; color:white; }
-#viewBtn{ background:#17a2b8; color:white; }
-#downloadBtn{ background:#ffc107; color:black; }
+#backBtn{
+  background:#007bff;
+  color:white;
+}
+
+#viewBtn{
+  background:#17a2b8;
+  color:white;
+}
+
+#downloadBtn{
+  background:#ffc107;
+  color:black;
+}
+
 </style>
 
 </head>
@@ -130,6 +169,7 @@ button:disabled{
   <a href="index.html">🔽 Unduh Sertifikat</a>
   <a href="upload.html">🖼️ Unggah Flyer</a>
   <a href="flyers.html">📄 Lihat Flyer</a>
+  <a href="narasumber.html">🎤 Input Narasumber</a>
 </nav>
 
 <div class="container">
@@ -139,50 +179,121 @@ button:disabled{
 <form id="uploadForm">
 
 <label>Nama Pemateri</label>
-<input type="text" id="nama" required>
+<input
+type="text"
+id="nama"
+required
+
+>
 
 <label>Judul Materi</label>
-<input type="text" id="judul_materi" required>
+<input
+type="text"
+id="judul_materi"
+required
+
+>
 
 <label>Tanggal Pelaksanaan</label>
-<input type="date" id="tanggal" required>
+<input
+type="date"
+id="tanggal"
+required
+
+>
 
 <label>Tempat Pelaksanaan</label>
-<input type="text" id="tempat" required>
+<input
+type="text"
+id="tempat"
+required
+
+>
 
 <label>Waktu Pelaksanaan</label>
-<input type="text" id="waktu" required>
+<input
+type="text"
+id="waktu"
+placeholder="08.00 - 10.00 WIB"
+required
+
+>
 
 <label>Upload Flyer</label>
-<input type="file" id="foto" accept="image/*" required>
+<input
+type="file"
+id="foto"
+accept="image/*"
+required
 
-<button type="submit" id="submitBtn">
+>
+
+<button
+type="submit"
+id="submitBtn"
+
+>
+
+```
 Kirim Flyer
-</button>
+```
+
+  </button>
 
 </form>
 
 <div id="status"></div>
 
 <div id="resultBox">
-  <h3>Upload Berhasil</h3>
 
-  <button class="result-btn" id="backBtn" type="button">
-    Kembali ke Halaman Flyer
+  <h3>✅ Upload Berhasil</h3>
+
+<button
+class="result-btn"
+id="backBtn"
+type="button"
+onclick="location.href='flyers.html'"
+
+>
+
+```
+📄 Kembali ke Halaman Flyer
+```
+
   </button>
 
-  <button class="result-btn" id="viewBtn" type="button">
-    Lihat Flyer
+<button
+class="result-btn"
+id="viewBtn"
+type="button"
+onclick="location.href='flyers.html'"
+
+>
+
+```
+👁️ Lihat Flyer
+```
+
   </button>
 
-  <button class="result-btn" id="downloadBtn" type="button">
-    Unduh Sertifikat
+<button
+class="result-btn"
+id="downloadBtn"
+type="button"
+onclick="location.href='index.html'"
+
+>
+
+```
+🔽 Unduh Sertifikat
+```
+
   </button>
+
 </div>
 
 </div>
 
-<!-- FIX PATH SCRIPT (KRITIS) -->
 <script src="js/upload.js"></script>
 
 </body>
