@@ -243,58 +243,52 @@ async function loadFlyers(){
 
 try{
 
-const res =
-await fetch(API_URL);
-
-const data =
-await res.json();
-
-console.log(data);
+const res=await fetch(API_URL);
+let data=await res.json();
 
 if(!Array.isArray(data)){
-
-grid.innerHTML =
-'<div class="empty">Data API tidak valid.</div>';
-
+grid.innerHTML='<div class="empty">Data API tidak valid.</div>';
 return;
-
 }
 
 if(data.length===0){
-
-grid.innerHTML =
-'<div class="empty">Belum ada flyer.</div>';
-
+grid.innerHTML='<div class="empty">Belum ada flyer.</div>';
 return;
-
 }
+
+/* =========================
+   SORT TANGGAL TERBARU
+========================= */
+
+data.sort((a,b)=>{
+
+return new Date(b.tanggal)-new Date(a.tanggal);
+
+});
 
 grid.innerHTML="";
 
-data.reverse();
-
 data.forEach(item=>{
 
-const image =
+const image=
 
-item.fileId && item.fileId !== ""
+item.fileId
 
-? `https://drive.google.com/uc?export=view&id=${item.fileId}`
+?`https://drive.google.com/thumbnail?id=${item.fileId}&sz=w1600`
 
-: "https://placehold.co/600x800?text=No+Flyer";
-  
-const card =
-document.createElement("div");
+:"https://placehold.co/600x800?text=No+Flyer";
+
+const card=document.createElement("div");
 
 card.className="card";
 
-card.innerHTML=
-
-`
+card.innerHTML=`
 
 <img
 src="${image}"
-loading="lazy">
+loading="lazy"
+referrerpolicy="no-referrer"
+onerror="this.src='https://placehold.co/600x800?text=No+Flyer'">
 
 <div class="content">
 
@@ -302,7 +296,7 @@ loading="lazy">
 
 <p><b>Pemateri</b><br>${item.nama}</p>
 
-<p><b>Tanggal</b><br>${item.tanggal}</p>
+<p><b>Tanggal</b><br>${new Date(item.tanggal).toLocaleDateString("id-ID")}</p>
 
 <p><b>Tempat</b><br>${item.tempat}</p>
 
@@ -321,11 +315,11 @@ Daftar Sekarang
 
 `;
 
-card
-.querySelector("img")
-.onclick=()=>{
+card.querySelector("img").onclick=()=>{
 
-modalImg.src=image;
+modalImg.src=
+
+`https://drive.google.com/thumbnail?id=${item.fileId}&sz=w2500`;
 
 modal.classList.add("show");
 
@@ -339,14 +333,13 @@ grid.appendChild(card);
 
 console.error(err);
 
-grid.innerHTML=
-
-'<div class="empty">Gagal memuat data.</div>';
+grid.innerHTML='<div class="empty">Gagal memuat data.</div>';
 
 }
 
 }
-
+  
+  
 modal.onclick=()=>{
 
 modal.classList.remove("show");
