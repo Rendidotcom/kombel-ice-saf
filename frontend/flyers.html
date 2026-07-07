@@ -1,139 +1,175 @@
 <!DOCTYPE html>
-
 <html lang="id">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Flyer Kegiatan ICE SAF</title>
 
 <style>
 
 *{
-  box-sizing:border-box;
+box-sizing:border-box;
 }
 
 body{
-  margin:0;
-  padding:20px;
-  font-family:Arial,sans-serif;
-  background:#f4f4f4;
+margin:0;
+padding:20px;
+font-family:Arial,sans-serif;
+background:#f4f4f4;
 }
 
 nav{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  margin-bottom:20px;
-  flex-wrap:wrap;
+display:flex;
+justify-content:center;
+gap:10px;
+flex-wrap:wrap;
+margin-bottom:25px;
 }
 
 nav a{
-  text-decoration:none;
-  background:#007bff;
-  color:white;
-  padding:10px 15px;
-  border-radius:6px;
-  font-size:14px;
-}
-
-nav a:hover{
-  background:#0056b3;
+text-decoration:none;
+background:#0d6efd;
+color:white;
+padding:10px 18px;
+border-radius:6px;
 }
 
 h1{
-  text-align:center;
-  margin-bottom:30px;
+text-align:center;
+margin-bottom:30px;
 }
 
-.flyer-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
-  gap:20px;
+#flyerGrid{
+
+display:grid;
+
+grid-template-columns:
+repeat(auto-fit,minmax(320px,1fr));
+
+gap:20px;
+
 }
 
-.flyer-card{
-  background:white;
-  border-radius:12px;
-  overflow:hidden;
-  box-shadow:0 2px 10px rgba(0,0,0,.15);
-  transition:.2s;
+.card{
+
+background:white;
+
+border-radius:12px;
+
+overflow:hidden;
+
+box-shadow:0 2px 10px rgba(0,0,0,.15);
+
 }
 
-.flyer-card:hover{
-  transform:translateY(-3px);
+.card img{
+
+width:100%;
+
+height:430px;
+
+object-fit:cover;
+
+cursor:pointer;
+
+display:block;
+
 }
 
-.flyer-image{
-  width:100%;
-  height:420px;
-  object-fit:cover;
-  display:block;
-  cursor:pointer;
+.content{
+
+padding:15px;
+
 }
 
-.flyer-content{
-  padding:15px;
+.content h3{
+
+margin-top:0;
+
 }
 
-.flyer-content h3{
-  margin-top:0;
-  margin-bottom:10px;
+.content p{
+
+margin:8px 0;
+
 }
 
-.flyer-content p{
-  margin:6px 0;
-}
+.btn{
 
-.daftar-btn{
-  display:block;
-  text-align:center;
-  padding:12px;
-  background:#28a745;
-  color:white;
-  text-decoration:none;
-  font-weight:bold;
-}
+display:block;
 
-.daftar-btn:hover{
-  background:#218838;
-}
+text-align:center;
 
-.empty{
-  text-align:center;
-  color:#666;
-  margin-top:40px;
-  font-size:18px;
+background:#28a745;
+
+color:white;
+
+padding:12px;
+
+text-decoration:none;
+
+font-weight:bold;
+
 }
 
 .loading{
-  text-align:center;
-  font-size:18px;
-  color:#555;
+
+text-align:center;
+
+font-size:18px;
+
+}
+
+.empty{
+
+text-align:center;
+
+font-size:18px;
+
+color:#666;
+
 }
 
 .modal{
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,.9);
-  justify-content:center;
-  align-items:center;
-  z-index:9999;
-  padding:20px;
+
+display:none;
+
+position:fixed;
+
+top:0;
+
+left:0;
+
+width:100%;
+
+height:100%;
+
+background:rgba(0,0,0,.9);
+
+justify-content:center;
+
+align-items:center;
+
+z-index:9999;
+
+padding:20px;
+
 }
 
 .modal.show{
-  display:flex;
+
+display:flex;
+
 }
 
 .modal img{
-  max-width:95%;
-  max-height:95%;
-  border-radius:10px;
+
+max-width:95%;
+
+max-height:95%;
+
 }
 
 </style>
@@ -143,176 +179,179 @@ h1{
 <body>
 
 <nav>
-  <a href="index.html">
-    🔽 Unduh Sertifikat
-  </a>
 
-  <a href="upload.html">
-    🖼️ Upload Flyer
-  </a>
+<a href="index.html">
+Unduh Sertifikat
+</a>
 
-  <a href="narasumber.html">
-    🎤 Input Narasumber
-  </a>
+<a href="upload.html">
+Upload Flyer
+</a>
 
-  <a href="flyers.html">
-    📄 Lihat Flyer
-  </a>
+<a href="narasumber.html">
+Input Narasumber
+</a>
+
+<a href="flyers.html">
+Lihat Flyer
+</a>
+
 </nav>
 
 <h1>Flyer Kegiatan ICE SAF</h1>
 
-<div id="flyerGrid" class="flyer-grid">
-  <div class="loading">
-    Memuat data flyer...
-  </div>
+<div
+id="flyerGrid"
+class="loading">
+
+Memuat data...
+
 </div>
 
-<div id="modal" class="modal">
-  <img id="modalImg" src="">
+<div
+id="modal"
+class="modal">
+
+<img id="modalImg">
+
 </div>
 
 <script>
 
 const API_URL =
-"https://script.google.com/macros/s/AKfycbxkxTKdqIY0DVrh-_qnPcRnDkX3b6FwPRjBMoInDRi0-EKtyt93-OkhSZ_tBtrLkhu2mA/exec?action=getFlyers";
+"https://script.google.com/macros/s/AKfycbxxIMn8m03XNzrNkd75UONuwVBrgvox5TI0QKoOOtpCc8_UMKkHV1bv_58NgwmZ_amGKQ/exec?action=getFlyers";
 
-const DAFTAR_URL =
+const FORM_URL =
 "https://docs.google.com/forms/d/e/1FAIpQLSdNOC8FuXcupj0QU-Y-TP-w4IncAKSPsCiN8gt_sGXZaa6XaQ/viewform";
 
-const flyerGrid =
-document.getElementById("flyerGrid");
+const grid =
+document.getElementById(
+"flyerGrid"
+);
 
 const modal =
-document.getElementById("modal");
+document.getElementById(
+"modal"
+);
 
 const modalImg =
-document.getElementById("modalImg");
+document.getElementById(
+"modalImg"
+);
 
 async function loadFlyers(){
 
-  try{
+try{
 
-    const response =
-      await fetch(API_URL);
+const res =
+await fetch(API_URL);
 
-    const flyers =
-      await response.json();
+const data =
+await res.json();
 
-    console.log(flyers);
+console.log(data);
 
-    if(!Array.isArray(flyers)){
+if(!Array.isArray(data)){
 
-      flyerGrid.innerHTML =
-        '<div class="empty">Format data API tidak valid.</div>';
+grid.innerHTML =
+'<div class="empty">Data API tidak valid.</div>';
 
-      return;
-
-    }
-
-    if(flyers.length === 0){
-
-      flyerGrid.innerHTML =
-        '<div class="empty">Belum ada flyer.</div>';
-
-      return;
-
-    }
-
-    flyerGrid.innerHTML = "";
-
-    flyers.reverse();
-
-    flyers.forEach(flyer => {
-
-      const imageSrc =
-        `https://drive.google.com/thumbnail?id=${flyer.fileId}&sz=w1200`;
-
-      const card =
-        document.createElement("div");
-
-      card.className =
-        "flyer-card";
-
-      card.innerHTML = `
-        <img
-          class="flyer-image"
-          src="${imageSrc}"
-          alt="${flyer.judul}"
-          loading="lazy"
-        >
-
-        <div class="flyer-content">
-
-          <h3>${flyer.judul}</h3>
-
-          <p>
-            <strong>Pemateri:</strong>
-            ${flyer.nama}
-          </p>
-
-          <p>
-            <strong>Tanggal:</strong>
-            ${flyer.tanggal}
-          </p>
-
-          <p>
-            <strong>Tempat:</strong>
-            ${flyer.tempat}
-          </p>
-
-          <p>
-            <strong>Waktu:</strong>
-            ${flyer.waktu}
-          </p>
-
-        </div>
-
-        <a
-          class="daftar-btn"
-          href="${DAFTAR_URL}"
-          target="_blank"
-        >
-          Daftar Sekarang
-        </a>
-      `;
-
-      const image =
-        card.querySelector(".flyer-image");
-
-      image.addEventListener(
-        "click",
-        () => {
-
-          modalImg.src =
-            `https://drive.google.com/thumbnail?id=${flyer.fileId}&sz=w2500`;
-
-          modal.classList.add("show");
-
-        }
-      );
-
-      flyerGrid.appendChild(card);
-
-    });
-
-  }catch(err){
-
-    console.error(err);
-
-    flyerGrid.innerHTML =
-      '<div class="empty">Gagal memuat data flyer.</div>';
-
-  }
+return;
 
 }
 
-modal.addEventListener(
-  "click",
-  () => {
-    modal.classList.remove("show");
-  }
-);
+if(data.length===0){
+
+grid.innerHTML =
+'<div class="empty">Belum ada flyer.</div>';
+
+return;
+
+}
+
+grid.innerHTML="";
+
+data.reverse();
+
+data.forEach(item=>{
+
+const image =
+
+item.imageUrl && item.imageUrl!==""
+
+? item.imageUrl.replace("/view","/preview")
+
+: "https://placehold.co/600x800?text=No+Flyer";
+
+const card =
+document.createElement("div");
+
+card.className="card";
+
+card.innerHTML=
+
+`
+
+<img
+src="${image}"
+loading="lazy">
+
+<div class="content">
+
+<h3>${item.judul}</h3>
+
+<p><b>Pemateri</b><br>${item.nama}</p>
+
+<p><b>Tanggal</b><br>${item.tanggal}</p>
+
+<p><b>Tempat</b><br>${item.tempat}</p>
+
+<p><b>Waktu</b><br>${item.waktu}</p>
+
+</div>
+
+<a
+class="btn"
+href="${FORM_URL}"
+target="_blank">
+
+Daftar Sekarang
+
+</a>
+
+`;
+
+card
+.querySelector("img")
+.onclick=()=>{
+
+modalImg.src=image;
+
+modal.classList.add("show");
+
+};
+
+grid.appendChild(card);
+
+});
+
+}catch(err){
+
+console.error(err);
+
+grid.innerHTML=
+
+'<div class="empty">Gagal memuat data.</div>';
+
+}
+
+}
+
+modal.onclick=()=>{
+
+modal.classList.remove("show");
+
+};
 
 loadFlyers();
 
