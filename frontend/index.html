@@ -8,102 +8,96 @@
 <style>
 
 *{
-  box-sizing:border-box;
+    box-sizing:border-box;
 }
 
 body{
-  margin:0;
-  padding:20px;
-  font-family:Arial,sans-serif;
-  background:#f4f4f4;
+    margin:0;
+    padding:20px;
+    font-family:Arial,sans-serif;
+    background:#f4f4f4;
 }
 
-/* =========================
-   NAVBAR
-========================= */
-
 nav{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  margin-bottom:20px;
-  flex-wrap:wrap;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:20px;
+    flex-wrap:wrap;
 }
 
 nav a{
-  text-decoration:none;
-  background:#007bff;
-  color:white;
-  padding:10px 15px;
-  border-radius:6px;
-  font-size:14px;
-  font-weight:bold;
+    text-decoration:none;
+    background:#007bff;
+    color:white;
+    padding:10px 15px;
+    border-radius:6px;
+    font-size:14px;
+    font-weight:bold;
 }
 
 nav a:hover{
-  background:#0056b3;
+    background:#0056b3;
 }
 
-/* =========================
-   CONTAINER
-========================= */
-
 .container{
-  max-width:420px;
-  margin:auto;
-  background:white;
-  padding:30px;
-  border-radius:12px;
-  box-shadow:0 2px 12px rgba(0,0,0,.15);
+    max-width:420px;
+    margin:auto;
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 2px 12px rgba(0,0,0,.15);
 }
 
 h2{
-  text-align:center;
-  margin-top:0;
-  margin-bottom:20px;
+    text-align:center;
+    margin-top:0;
+    margin-bottom:20px;
 }
 
 input{
-  width:100%;
-  padding:12px;
-  border:1px solid #ccc;
-  border-radius:6px;
-  margin-bottom:15px;
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    margin-bottom:15px;
+    font-size:15px;
 }
 
 button{
-  width:100%;
-  padding:12px;
-  background:#28a745;
-  color:white;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  font-size:16px;
-  font-weight:bold;
+    width:100%;
+    padding:12px;
+    background:#28a745;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:bold;
 }
 
 button:hover{
-  opacity:.9;
+    opacity:.9;
 }
 
 button:disabled{
-  background:#999;
-  cursor:not-allowed;
+    background:#999;
+    cursor:not-allowed;
 }
 
 #message{
-  margin-top:15px;
-  text-align:center;
-  font-weight:bold;
+    margin-top:18px;
+    text-align:center;
+    font-weight:bold;
+    line-height:1.6;
 }
 
 .success{
-  color:green;
+    color:#1e7e34;
 }
 
 .error{
-  color:red;
+    color:#dc3545;
 }
 
 </style>
@@ -113,99 +107,122 @@ button:disabled{
 <body>
 
 <nav>
-  <a href="index.html">🔽 Unduh Sertifikat</a>
-  <a href="upload.html">🖼️ Unggah Flyer</a>
-  <a href="flyers.html">📄 Lihat Flyer</a>
-  <a href="narasumber.html">🎤 Input Narasumber</a>
+    <a href="index.html">🔽 Unduh Sertifikat</a>
+    <a href="upload.html">🖼️ Unggah Flyer</a>
+    <a href="flyers.html">📄 Lihat Flyer</a>
+    <a href="narasumber.html">🎤 Input Narasumber</a>
 </nav>
 
 <div class="container">
 
-  <h2>Unduh Sertifikat ICE SAF</h2>
+    <h2>Unduh Sertifikat ICE SAF</h2>
 
-  <input
-    type="email"
-    id="email"
-    placeholder="Masukkan Email Peserta"
-  >
+    <input
+        type="email"
+        id="email"
+        placeholder="Masukkan Email Peserta">
 
-  <button onclick="downloadCertificate()">
-    Cek & Download Sertifikat
-  </button>
+    <button
+        id="downloadBtn"
+        onclick="downloadCertificate()">
+        Cek & Download Sertifikat
+    </button>
 
-  <div id="message"></div>
+    <div id="message"></div>
 
 </div>
 
 <script>
 
-/*
-====================================================
-GANTI URL INI KE WEB APP APPS SCRIPT FINAL
-====================================================
-*/
+const API_URL="https://script.google.com/macros/s/AKfycbxxIMn8m03XNzrNkd75UONuwVBrgvox5TI0QKoOOtpCc8_UMKkHV1bv_58NgwmZ_amGKQ/exec";
 
-const API_URL =
-"https://script.google.com/macros/s/AKfycbxkxTKdqIY0DVrh-_qnPcRnDkX3b6FwPRjBMoInDRi0-EKtyt93-OkhSZ_tBtrLkhu2mA/exec";
+const emailInput=document.getElementById("email");
+const message=document.getElementById("message");
+const button=document.getElementById("downloadBtn");
 
 async function downloadCertificate(){
 
-  const email =
-    document
-      .getElementById("email")
-      .value
-      .trim();
+    const email=emailInput.value.trim();
 
-  const message =
-    document.getElementById("message");
+    message.className="";
+    message.innerHTML="";
 
-  message.className = "";
-  message.innerHTML = "";
+    if(email===""){
 
-  if(!email){
+        message.className="error";
+        message.innerHTML="Silakan masukkan email peserta.";
 
-    message.className = "error";
-    message.innerHTML =
-      "Email wajib diisi";
+        emailInput.focus();
 
-    return;
-  }
+        return;
 
-  try{
+    }
 
-    message.innerHTML =
-      "Mencari sertifikat...";
+    button.disabled=true;
 
-    const url =
-      API_URL +
-      "?action=certificate" +
-      "&email=" +
-      encodeURIComponent(email);
+    message.className="success";
+    message.innerHTML="Sedang membuat sertifikat...";
 
-    window.open(
-      url,
-      "_blank"
-    );
+    try{
 
-    message.className =
-      "success";
+        const response=await fetch(
 
-    message.innerHTML =
-      "Jika data ditemukan, sertifikat akan otomatis terunduh.";
+            API_URL+
+            "?action=generateCertificate"+
+            "&email="+
+            encodeURIComponent(email)
 
-  }catch(err){
+        );
 
-    console.error(err);
+        const result=await response.json();
 
-    message.className =
-      "error";
+        if(!result.success){
 
-    message.innerHTML =
-      "Terjadi kesalahan.";
+            message.className="error";
+            message.innerHTML=result.message;
 
-  }
+            button.disabled=false;
+
+            return;
+
+        }
+
+        message.className="success";
+
+        message.innerHTML=
+        "Halo <b>"+result.nama+"</b><br>Sertifikat berhasil dibuat.<br>Mengunduh PDF...";
+
+        setTimeout(function(){
+
+            window.location.href=result.url;
+
+        },700);
+
+    }
+
+    catch(error){
+
+        console.error(error);
+
+        message.className="error";
+
+        message.innerHTML="Terjadi kesalahan saat menghubungi server.";
+
+    }
+
+    button.disabled=false;
 
 }
+
+emailInput.addEventListener("keypress",function(e){
+
+    if(e.key==="Enter"){
+
+        downloadCertificate();
+
+    }
+
+});
 
 </script>
 
