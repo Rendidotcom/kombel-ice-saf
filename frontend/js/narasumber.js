@@ -1,7 +1,7 @@
 "use strict";
 
 const API_URL =
-"https://script.google.com/macros/s/AKfycbxkxTKdqIY0DVrh-_qnPcRnDkX3b6FwPRjBMoInDRi0-EKtyt93-OkhSZ_tBtrLkhu2mA/exec";
+"https://script.google.com/macros/s/AKfycbwKyJkb5Q6EecNOq785RIO6rqeGl8FlJdVF1fti1-BfPiUd6VNHcL1fP1cFB2J5JyEj_w/exec";
 
 document
 .getElementById("narasumberForm")
