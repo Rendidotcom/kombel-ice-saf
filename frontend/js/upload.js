@@ -85,6 +85,7 @@ return;
 
 const base64 =
 await fileToBase64(foto);
+console.log(base64.length);
 
 const payload =
 new URLSearchParams();
