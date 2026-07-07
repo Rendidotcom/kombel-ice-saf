@@ -2,7 +2,6 @@
 
 const API_URL =
 "https://script.google.com/macros/s/AKfycbxkxTKdqIY0DVrh-_qnPcRnDkX3b6FwPRjBMoInDRi0-EKtyt93-OkhSZ_tBtrLkhu2mA/exec";
-
 const form =
 document.getElementById("uploadForm");
 
