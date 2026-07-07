@@ -277,12 +277,12 @@ data.forEach(item=>{
 
 const image =
 
-item.imageUrl && item.imageUrl!==""
+item.fileId && item.fileId !== ""
 
-? item.imageUrl.replace("/view","/preview")
+? `https://drive.google.com/uc?export=view&id=${item.fileId}`
 
 : "https://placehold.co/600x800?text=No+Flyer";
-
+  
 const card =
 document.createElement("div");
 
