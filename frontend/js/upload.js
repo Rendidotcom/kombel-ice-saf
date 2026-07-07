@@ -115,16 +115,20 @@ base64
 );
 
 const response =
-await fetch(
-API_URL,
-{
+await fetch(API_URL,{
 method:"POST",
 body:payload
-}
-);
+});
+
+console.log(response.status);
+
+const text =
+await response.text();
+
+console.log(text);
 
 const result =
-await response.json();
+JSON.parse(text);
 
 if(result.success){
 
